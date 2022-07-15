@@ -1,1 +1,1 @@
-# ginEssantial
+# ginEssential
