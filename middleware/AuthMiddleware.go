@@ -4,7 +4,6 @@ import (
 	"Essential/common"
 	"Essential/model"
 	"fmt"
-	"net/http"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -19,9 +18,9 @@ func AuthMiddleware() gin.HandlerFunc {
 
 		//validate token formate
 		if tokenString == "" || !strings.HasPrefix(tokenString, "Bearer ") {
-			ctx.JSON(http.StatusUnauthorized, gin.H{
-				"code": 401,
-				"msg":  "权限不足",
+			ctx.JSON(201, gin.H{
+				"code": 201,
+				"msg":  "格式错误，权限不足",
 			})
 			ctx.Abort()
 			return
@@ -32,9 +31,9 @@ func AuthMiddleware() gin.HandlerFunc {
 		token, claims, err := common.ParseToken(tokenString)
 
 		if err != nil || !token.Valid {
-			ctx.JSON(http.StatusUnauthorized, gin.H{
-				"code": 401,
-				"msg":  "权限不足",
+			ctx.JSON(201, gin.H{
+				"code": 201,
+				"msg":  "解析错误，权限不足",
 			})
 			ctx.Abort()
 			return
@@ -48,9 +47,9 @@ func AuthMiddleware() gin.HandlerFunc {
 
 		// 验证用户是否存在
 		if user.ID == 0 {
-			ctx.JSON(http.StatusUnauthorized, gin.H{
-				"code": 401,
-				"msg":  "权限不足",
+			ctx.JSON(201, gin.H{
+				"code": 201,
+				"msg":  "用户不存在，权限不足",
 			})
 			ctx.Abort()
 			return
