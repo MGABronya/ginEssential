@@ -28,19 +28,11 @@ func Register(ctx *gin.Context) {
 	name := requestUser.Name
 	//数据验证
 	if !util.VerifyEmailFormat(email) {
-<<<<<<< HEAD
 		response.Response(ctx, 201, 201, nil, "邮箱格式错误")
 		return
 	}
 	if len(password) < 6 {
 		response.Response(ctx, 201, 201, nil, "密码不能少于6位")
-=======
-		response.Response(ctx, http.StatusUnprocessableEntity, 201, nil, "邮箱格式错误")
-		return
-	}
-	if len(password) < 6 {
-		response.Response(ctx, http.StatusUnprocessableEntity, 201, nil, "密码不能少于6位")
->>>>>>> main
 		return
 	}
 
@@ -52,11 +44,7 @@ func Register(ctx *gin.Context) {
 
 	//判断email是否存在
 	if isEmailExist(DB, email) {
-<<<<<<< HEAD
 		response.Response(ctx, 201, 201, nil, "用户已经存在")
-=======
-		response.Response(ctx, http.StatusUnprocessableEntity, 201, nil, "用户已经存在")
->>>>>>> main
 		return
 	}
 	//创建用户
@@ -92,30 +80,18 @@ func Login(ctx *gin.Context) {
 	password := requestUser.Password
 	//数据验证
 	if !util.VerifyEmailFormat(email) {
-<<<<<<< HEAD
 		response.Response(ctx, 201, 201, nil, "邮箱格式错误")
 		return
 	}
 	if len(password) < 6 {
 		response.Response(ctx, 201, 201, nil, "密码不能少于6位")
-=======
-		response.Response(ctx, http.StatusUnprocessableEntity, 201, nil, "邮箱格式错误")
-		return
-	}
-	if len(password) < 6 {
-		response.Response(ctx, http.StatusUnprocessableEntity, 201, nil, "密码不能少于6位")
->>>>>>> main
 		return
 	}
 	//判断邮箱是否存在
 	var user model.User
 	DB.Where("email = ?", email).First(&user)
 	if user.ID == 0 {
-<<<<<<< HEAD
 		response.Response(ctx, 201, 201, nil, "用户不存在")
-=======
-		response.Response(ctx, http.StatusUnprocessableEntity, 201, nil, "用户不存在")
->>>>>>> main
 		return
 	}
 	//判断密码是否正确

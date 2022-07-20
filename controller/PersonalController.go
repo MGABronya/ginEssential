@@ -34,7 +34,6 @@ func PersonalUpdate(ctx *gin.Context) {
 		return
 	}
 	if !util.VerifyEmailFormat(personalChange.Email) {
-<<<<<<< HEAD
 		response.Response(ctx, 201, 201, nil, "邮箱格式错误")
 		return
 	}
@@ -44,17 +43,6 @@ func PersonalUpdate(ctx *gin.Context) {
 	}
 	if personalChange.QQ != "" && !util.VerifyQQFormat(personalChange.QQ) {
 		response.Response(ctx, 201, 201, nil, "QQ格式错误")
-=======
-		response.Response(ctx, http.StatusUnprocessableEntity, 201, nil, "邮箱格式错误")
-		return
-	}
-	if personalChange.Telephone != "" && !util.VerifyMobileFormat(personalChange.Telephone) {
-		response.Response(ctx, http.StatusUnprocessableEntity, 201, nil, "手机号格式错误")
-		return
-	}
-	if personalChange.QQ != "" && !util.VerifyQQFormat(personalChange.QQ) {
-		response.Response(ctx, http.StatusUnprocessableEntity, 201, nil, "QQ格式错误")
->>>>>>> main
 		return
 	}
 

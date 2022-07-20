@@ -18,15 +18,9 @@ func AuthMiddleware() gin.HandlerFunc {
 
 		//validate token formate
 		if tokenString == "" || !strings.HasPrefix(tokenString, "Bearer ") {
-<<<<<<< HEAD
 			ctx.JSON(201, gin.H{
 				"code": 201,
 				"msg":  "格式错误，权限不足",
-=======
-			ctx.JSON(http.StatusUnauthorized, gin.H{
-				"code": 201,
-				"msg":  "权限不足",
->>>>>>> main
 			})
 			ctx.Abort()
 			return
@@ -37,15 +31,9 @@ func AuthMiddleware() gin.HandlerFunc {
 		token, claims, err := common.ParseToken(tokenString)
 
 		if err != nil || !token.Valid {
-<<<<<<< HEAD
 			ctx.JSON(201, gin.H{
 				"code": 201,
 				"msg":  "解析错误，权限不足",
-=======
-			ctx.JSON(http.StatusUnauthorized, gin.H{
-				"code": 201,
-				"msg":  "权限不足",
->>>>>>> main
 			})
 			ctx.Abort()
 			return
@@ -59,15 +47,9 @@ func AuthMiddleware() gin.HandlerFunc {
 
 		// 验证用户是否存在
 		if user.ID == 0 {
-<<<<<<< HEAD
 			ctx.JSON(201, gin.H{
 				"code": 201,
 				"msg":  "用户不存在，权限不足",
-=======
-			ctx.JSON(http.StatusUnauthorized, gin.H{
-				"code": 201,
-				"msg":  "权限不足",
->>>>>>> main
 			})
 			ctx.Abort()
 			return
