@@ -18,8 +18,16 @@ import (
 )
 
 func PersonalPage(ctx *gin.Context) {
-	user, _ := ctx.Get("user")
-	ctx.JSON(http.StatusOK, gin.H{"code": 200, "data": gin.H{"user": dto.ToUserDto(user.(model.User))}})
+	tuser, _ := ctx.Get("user")
+	db := common.GetDB()
+	user := tuser.(model.User)
+	var articles []model.Article
+	db.Order("created_at desc").Find(&articles).Where("user.id = ?", user.ID)
+
+	var posts []model.Post
+	db.Order("created_at desc").Find(&posts).Where("user.id = ?", user.ID)
+
+	ctx.JSON(http.StatusOK, gin.H{"code": 200, "data": gin.H{"user": dto.ToUserDto(user), "articles": articles, "posts": posts}})
 }
 
 func PersonalUpdate(ctx *gin.Context) {
@@ -123,5 +131,11 @@ func PersonalShow(ctx *gin.Context) {
 		response.Fail(ctx, nil, "用户不存在")
 		return
 	}
-	response.Success(ctx, gin.H{"user": dto.ToUserDto(user)}, "成功")
+	var articles []model.Article
+	db.Order("created_at desc").Find(&articles).Where("user.id = ?", user.ID)
+
+	var posts []model.Post
+	db.Order("created_at desc").Find(&posts).Where("user.id = ?", user.ID)
+
+	ctx.JSON(http.StatusOK, gin.H{"code": 200, "data": gin.H{"user": dto.ToUserDto(user), "articles": articles, "posts": posts}})
 }
