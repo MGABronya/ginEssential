@@ -1,12 +1,17 @@
 package main
 
-import (
-	"fmt"
-	"os"
-)
+type a struct {
+	b int
+}
+
+func (A a) c() {
+	A.b = 10
+}
 
 func main() {
-	dir, _ := os.Getwd()
-	fmt.Print(dir)
-
+	A := a{
+		b: 8,
+	}
+	A.c()
+	println(A)
 }

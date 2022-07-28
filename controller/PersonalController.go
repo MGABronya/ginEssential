@@ -22,12 +22,11 @@ func PersonalPage(ctx *gin.Context) {
 	db := common.GetDB()
 	user := tuser.(model.User)
 	var articles []model.Article
-	db.Order("created_at desc").Find(&articles).Where("user.id = ?", user.ID)
+	db.Order("created_at desc").Where("user_id = ?", user.ID).Find(&articles)
 
-	var threads []model.Thread
-	db.Order("created_at desc").Find(&threads).Where("user.id = ?", user.ID)
-
-	ctx.JSON(http.StatusOK, gin.H{"code": 200, "data": gin.H{"user": dto.ToUserDto(user), "articles": articles, "threads": threads}})
+	var posts []model.Post
+	db.Order("created_at desc").Where("user_id = ?", user.ID).Find(&posts)
+	ctx.JSON(http.StatusOK, gin.H{"code": 200, "data": gin.H{"user": dto.ToUserDto(user), "articles": articles, "posts": posts}})
 }
 
 func PersonalUpdate(ctx *gin.Context) {
@@ -133,10 +132,10 @@ func PersonalShow(ctx *gin.Context) {
 		return
 	}
 	var articles []model.Article
-	db.Order("created_at desc").Find(&articles).Where("user.id = ?", user.ID)
+	db.Order("created_at desc").Where("user_id = ?", user.ID).Find(&articles)
 
 	var posts []model.Post
-	db.Order("created_at desc").Find(&posts).Where("user.id = ?", user.ID)
+	db.Order("created_at desc").Where("user_id = ?", user.ID).Find(&posts)
 
 	ctx.JSON(http.StatusOK, gin.H{"code": 200, "data": gin.H{"user": dto.ToUserDto(user), "articles": articles, "posts": posts}})
 }

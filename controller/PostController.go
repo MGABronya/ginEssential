@@ -168,7 +168,7 @@ func (p PostController) Show(ctx *gin.Context) {
 	}
 
 	var threads []model.Thread
-	p.DB.Where("post_id = ?", post.ID).Find(&threads)
+	p.DB.Order("created_at asc").Where("post_id = ?", post.ID).Find(&threads)
 
 	// 返回数据
 	response.Success(ctx, gin.H{"post": post, "threads": threads}, "成功")
