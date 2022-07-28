@@ -41,6 +41,7 @@ func (a ArticleController) Create(ctx *gin.Context) {
 		Content: requestArticle.Content,
 		Icon:    user.(model.User).Icon,
 		Name:    user.(model.User).Name,
+		Email:   user.(model.User).Email,
 	}
 
 	// 插入数据

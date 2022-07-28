@@ -14,6 +14,7 @@ type Thread struct {
 	UpdatedAt Time      `json:"updated_at" gorm:"type:timestamp"`
 	Name      string    `json:"name" gorm:"type:varchar(50)"`
 	Icon      string    `json:"icon" gorm:"type:varchar(50)"` //这里的Icon存储的是图像文件的地址
+	Email     string    `json:"email" gorm:"type:varchar(50);not null"`
 }
 
 func (thread *Thread) BeforeCreate(scope *gorm.Scope) error {

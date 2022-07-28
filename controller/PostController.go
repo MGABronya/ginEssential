@@ -41,6 +41,7 @@ func (p PostController) Create(ctx *gin.Context) {
 		Content: requestPost.Content,
 		Icon:    user.(model.User).Icon,
 		Name:    user.(model.User).Name,
+		Email:   user.(model.User).Email,
 	}
 
 	// 插入数据
@@ -77,6 +78,7 @@ func (p PostController) ThreadCreate(ctx *gin.Context) {
 		Content: requestThread.Content,
 		Icon:    user.(model.User).Icon,
 		Name:    user.(model.User).Name,
+		Email:   user.(model.User).Email,
 	}
 
 	// 插入数据

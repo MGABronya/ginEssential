@@ -24,10 +24,10 @@ func PersonalPage(ctx *gin.Context) {
 	var articles []model.Article
 	db.Order("created_at desc").Find(&articles).Where("user.id = ?", user.ID)
 
-	var posts []model.Post
-	db.Order("created_at desc").Find(&posts).Where("user.id = ?", user.ID)
+	var threads []model.Thread
+	db.Order("created_at desc").Find(&threads).Where("user.id = ?", user.ID)
 
-	ctx.JSON(http.StatusOK, gin.H{"code": 200, "data": gin.H{"user": dto.ToUserDto(user), "articles": articles, "posts": posts}})
+	ctx.JSON(http.StatusOK, gin.H{"code": 200, "data": gin.H{"user": dto.ToUserDto(user), "articles": articles, "threads": threads}})
 }
 
 func PersonalUpdate(ctx *gin.Context) {
@@ -66,9 +66,10 @@ func PersonalUpdate(ctx *gin.Context) {
 	user.Hobby = personalChange.Hobby
 
 	db.Save(&user)
-	db.Model(&model.Article{}).Where("user_id = ?", user.ID).Update("name", user.Name)
-	db.Model(&model.Post{}).Where("user_id = ?", user.ID).Update("name", user.Name)
-	db.Model(&model.Thread{}).Where("user_id = ?", user.ID).Update("name", user.Name)
+	db.Model(&model.Article{}).Where("user_id = ?", user.ID).Updates(model.Article{Name: user.Name, Email: user.Email})
+	db.Model(&model.Post{}).Where("user_id = ?", user.ID).Updates(model.Post{Name: user.Name, Email: user.Email})
+	db.Model(&model.Thread{}).Where("user_id = ?", user.ID).Updates(model.Thread{Name: user.Name, Email: user.Email})
+
 	response.Success(ctx, gin.H{"user": dto.ToUserDto(user)}, "更新成功")
 }
 
