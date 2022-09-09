@@ -26,7 +26,11 @@ func PersonalPage(ctx *gin.Context) {
 
 	var posts []model.Post
 	db.Order("created_at desc").Where("user_id = ?", user.ID).Find(&posts)
-	ctx.JSON(http.StatusOK, gin.H{"code": 200, "data": gin.H{"user": dto.ToUserDto(user), "articles": articles, "posts": posts}})
+
+	var threads []model.Thread
+	db.Order("created_at desc").Where("user_id = ?", user.ID).Find(&threads)
+
+	ctx.JSON(http.StatusOK, gin.H{"code": 200, "data": gin.H{"user": dto.ToUserDto(user), "articles": articles, "posts": posts, "threads": threads}})
 }
 
 func PersonalUpdate(ctx *gin.Context) {
@@ -137,5 +141,8 @@ func PersonalShow(ctx *gin.Context) {
 	var posts []model.Post
 	db.Order("created_at desc").Where("user_id = ?", user.ID).Find(&posts)
 
-	ctx.JSON(http.StatusOK, gin.H{"code": 200, "data": gin.H{"user": dto.ToUserDto(user), "articles": articles, "posts": posts}})
+	var threads []model.Thread
+	db.Order("created_at desc").Where("user_id = ?", user.ID).Find(&threads)
+
+	ctx.JSON(http.StatusOK, gin.H{"code": 200, "data": gin.H{"user": dto.ToUserDto(user), "articles": articles, "posts": posts, "threads": threads}})
 }
