@@ -1,3 +1,7 @@
+// @Title  PersonalController
+// @Description  该文件用于提供操作个人界面的各种函数
+// @Author  MGAronya（张健）
+// @Update  MGAronya（张健）  2022-9-16 0:33
 package controller
 
 import (
@@ -17,28 +21,46 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// @title    PersonalPage
+// @description   提供用户的个人页面信息
+// @auth      MGAronya（张健）       2022-9-16 12:15
+// @param    ctx *gin.Context       接收一个上下文
+// @return   void
 func PersonalPage(ctx *gin.Context) {
 	tuser, _ := ctx.Get("user")
 	db := common.GetDB()
+
 	user := tuser.(model.User)
+
 	var articles []model.Article
+
+	// TODO 查看用户的所有文章
 	db.Order("created_at desc").Where("user_id = ?", user.ID).Find(&articles)
 
 	var posts []model.Post
+
+	// TODO 查看用户的所有帖子
 	db.Order("created_at desc").Where("user_id = ?", user.ID).Find(&posts)
 
 	var threads []model.Thread
+
+	// TODO 查看用户的所有跟帖
 	db.Order("created_at desc").Where("user_id = ?", user.ID).Find(&threads)
 
 	ctx.JSON(http.StatusOK, gin.H{"code": 200, "data": gin.H{"user": dto.ToUserDto(user), "articles": articles, "posts": posts, "threads": threads}})
 }
 
+// @title    PersonalUpdate
+// @description   个人页面更新
+// @auth      MGAronya（张健）       2022-9-16 12:31
+// @param    ctx *gin.Context       接收一个上下文
+// @return   void
 func PersonalUpdate(ctx *gin.Context) {
 	db := common.GetDB()
 	tuser, _ := ctx.Get("user")
 	user := tuser.(model.User)
 	var personalChange vo.PersonalChange
-	// 数据验证
+	// TODO 数据验证
 	if err := ctx.ShouldBind(&personalChange); err != nil {
 		log.Print(err.Error())
 		response.Fail(ctx, nil, "数据验证错误")
@@ -59,6 +81,7 @@ func PersonalUpdate(ctx *gin.Context) {
 
 	db.Where("id = ?", user.ID).Take(&user)
 
+	// TODO 更新用户信息
 	user.Name = personalChange.Name
 	user.Email = personalChange.Email
 	user.Telephone = personalChange.Telephone
@@ -69,6 +92,8 @@ func PersonalUpdate(ctx *gin.Context) {
 	user.Hobby = personalChange.Hobby
 
 	db.Save(&user)
+
+	// TODO 同时更新文章，帖子，跟帖中的缩率用户信息
 	db.Model(&model.Article{}).Where("user_id = ?", user.ID).Updates(model.Article{Name: user.Name, Email: user.Email})
 	db.Model(&model.Post{}).Where("user_id = ?", user.ID).Updates(model.Post{Name: user.Name, Email: user.Email})
 	db.Model(&model.Thread{}).Where("user_id = ?", user.ID).Updates(model.Thread{Name: user.Name, Email: user.Email})
@@ -76,12 +101,19 @@ func PersonalUpdate(ctx *gin.Context) {
 	response.Success(ctx, gin.H{"user": dto.ToUserDto(user)}, "更新成功")
 }
 
+// @title    PersonalIcon
+// @description   个人头像图片上传
+// @auth      MGAronya（张健）       2022-9-16 12:31
+// @param    ctx *gin.Context       接收一个上下文
+// @return   void
 func PersonalIcon(ctx *gin.Context) {
 	db := common.GetDB()
 	tuser, _ := ctx.Get("user")
 	user := tuser.(model.User)
 
 	file, err := ctx.FormFile("file")
+
+	//TODO 数据验证
 	if err != nil {
 		log.Print(err.Error())
 		response.Fail(ctx, nil, "数据验证错误")
@@ -95,30 +127,35 @@ func PersonalIcon(ctx *gin.Context) {
 		".gif":  true,
 		".jpeg": true,
 	}
+
+	// TODO 格式验证
 	if _, ok := allowExtMap[extName]; !ok {
 		response.Fail(ctx, nil, "文件格式有误")
 		return
 	}
 
-	if !util.VerifyIconFormat(user.Icon) { //非默认图片，则删除原本地文件
+	// TODO 非默认图片，则删除原本地文件
+	if !util.VerifyIconFormat(user.Icon) {
 		if err := os.Remove("./Icon/" + user.Icon); err != nil {
-			//如果删除失败则输出 file remove Error!
+			// TODO 如果删除失败则输出 file remove Error!
 			fmt.Println("file remove Error!")
-			//输出错误详细信息
+			// TODO 输出错误详细信息
 			fmt.Printf("%s", err)
 		} else {
-			//如果删除成功则输出 file remove OK!
+			// TODO 如果删除成功则输出 file remove OK!
 			fmt.Print("file remove OK!")
 		}
 	}
 	file.Filename = strconv.Itoa(int(user.ID)) + extName
 
-	ctx.SaveUploadedFile(file, "./Icon/"+file.Filename) //将文件存入本地
+	// TODO 将文件存入本地
+	ctx.SaveUploadedFile(file, "./Icon/"+file.Filename)
 
 	db.Where("id = ?", user.ID).Take(&user)
 
 	user.Icon = file.Filename
 
+	// TODO 更新用户简易信息
 	db.Model(&model.Article{}).Where("user_id = ?", user.ID).Update("icon", user.Icon)
 	db.Model(&model.Post{}).Where("user_id = ?", user.ID).Update("name", user.Icon)
 	db.Model(&model.Thread{}).Where("user_id = ?", user.ID).Update("name", user.Icon)
@@ -128,13 +165,22 @@ func PersonalIcon(ctx *gin.Context) {
 	response.Success(ctx, gin.H{"Icon": user.Icon}, "更新成功")
 }
 
+// @title    PersonalShow
+// @description   查看用户信息
+// @auth      MGAronya（张健）       2022-9-16 12:31
+// @param    ctx *gin.Context       接收一个上下文
+// @return   void
 func PersonalShow(ctx *gin.Context) {
 	db := common.GetDB()
 	var user model.User
+
+	// TODO 查看用户是否存在
 	if db.Where("id = ?", ctx.Params.ByName("id")).First(&user).RecordNotFound() {
 		response.Fail(ctx, nil, "用户不存在")
 		return
 	}
+
+	// TODO 查询用户的文章、帖子、跟帖
 	var articles []model.Article
 	db.Order("created_at desc").Where("user_id = ?", user.ID).Find(&articles)
 

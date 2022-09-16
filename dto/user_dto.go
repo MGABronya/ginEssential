@@ -1,21 +1,31 @@
+// @Title  user_dto
+// @Description  用于封装用户信息
+// @Author  MGAronya（张健）
+// @Update  MGAronya（张健）  2022-9-16 0:33
 package dto
 
 import (
 	"Essential/model"
 )
 
+// UserDto			定义了用户的基本信息
 type UserDto struct {
-	Name      string `gorm:"type:varchar(20);not null"`
-	Email     string `gorm:"type:varchar(50);not null;unique"`
-	Telephone string `gorm:"type:varchar(20)"`
-	Blog      string `gorm:"type:varchar(25)"`
-	QQ        string `gorm:"type:varchar(20)"`
-	Sex       bool   `gorm:"type:boolean"`
-	Address   string `gorm:"type:varchar(20)"`
-	Hobby     string `gorm:"type:varchar(50)"`
-	Icon      string `gorm:"type:varchar(50)"` //这里的Icon存储的是图像文件的地址
+	Name      string `gorm:"type:varchar(20);not null"`        // 用户名称
+	Email     string `gorm:"type:varchar(50);not null;unique"` // 邮箱
+	Telephone string `gorm:"type:varchar(20)"`                 // 手机号
+	Blog      string `gorm:"type:varchar(25)"`                 // 博客地址
+	QQ        string `gorm:"type:varchar(20)"`                 // QQ账号
+	Sex       bool   `gorm:"type:boolean"`                     // 性别
+	Address   string `gorm:"type:varchar(20)"`                 // 地址
+	Hobby     string `gorm:"type:varchar(50)"`                 // 爱好
+	Icon      string `gorm:"type:varchar(50)"`                 // 这里的Icon存储的是图像文件的地址
 }
 
+// @title    ToUserDto
+// @description   用户信息封装
+// @auth      MGAronya（张健）       2022-9-16 12:15
+// @param    user model.User       接收一个用户类
+// @return   UserDto			   返回一个用户的基本信息类
 func ToUserDto(user model.User) UserDto {
 	return UserDto{
 		Name:      user.Name,
@@ -29,15 +39,3 @@ func ToUserDto(user model.User) UserDto {
 		Icon:      user.Icon,
 	}
 }
-
-/*
-func test(){
-	r := gin.Default()
-	r.POST("/test/load", func(c *gin.Context){
-		file, _ := c.FormFile("file")
-		name := c.PostForm("name")                            //其它需要的传入信息
-		c.SaveUploadedFile(file, "./Icon/" + file.Filename)   //将文件存入本地
-		c.Writer.Header().Add("Content-Disposition", fmt.Sprintf("attachment; filename=%s", file.Filename))
-		c.File("./Icon/" + file.Filename)             //以上为返回文件
-	})
-}*/

@@ -1,3 +1,7 @@
+// @Title  AuthMiddleware
+// @Description  中间件，用于解析token
+// @Author  MGAronya（张健）
+// @Update  MGAronya（张健）  2022-9-16 0:33
 package middleware
 
 import (
@@ -9,14 +13,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// @title    AuthMiddleware
+// @description   中间件，用于解析token
+// @auth      MGAronya（张健）       2022-9-16 12:15
+// @param    void
+// @return   gin.HandlerFunc	将token解析完毕后传回上下文
 func AuthMiddleware() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		// 获取 authorization header
+		// TODO 获取 authorization header
 		tokenString := ctx.GetHeader("Authorization")
 
 		fmt.Print("请求token", tokenString)
 
-		//validate token formate
+		// TODO validate token formate
 		if tokenString == "" || !strings.HasPrefix(tokenString, "Bearer ") {
 			ctx.JSON(201, gin.H{
 				"code": 201,
@@ -26,7 +35,8 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		tokenString = tokenString[7:] //截取字符
+		// TODO 截取字符
+		tokenString = tokenString[7:]
 
 		token, claims, err := common.ParseToken(tokenString)
 
@@ -39,13 +49,13 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		//token通过验证, 获取claims中的UserID
+		// TODO token通过验证, 获取claims中的UserID
 		userId := claims.UserId
 		DB := common.GetDB()
 		var user model.User
 		DB.First(&user, userId)
 
-		// 验证用户是否存在
+		// TODO 验证用户是否存在
 		if user.ID == 0 {
 			ctx.JSON(201, gin.H{
 				"code": 201,
@@ -55,7 +65,7 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		//用户存在 将user信息写入上下文
+		// TODO 用户存在 将user信息写入上下文
 		ctx.Set("user", user)
 
 		ctx.Next()
