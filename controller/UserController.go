@@ -18,7 +18,6 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -52,7 +51,7 @@ func Register(ctx *gin.Context) {
 	log.Println(name, email, password)
 
 	// TODO 判断email是否存在
-	if isEmailExist(DB, email) {
+	if util.IsEmailExist(DB, email) {
 		response.Response(ctx, 201, 201, nil, "用户已经存在")
 		return
 	}
@@ -123,17 +122,6 @@ func Login(ctx *gin.Context) {
 	}
 	// TODO 返回结果
 	response.Success(ctx, gin.H{"token": token}, "登录成功")
-}
-
-// @title    isEmailExist
-// @description   查看email是否在数据库中存在
-// @auth      MGAronya（张健）       2022-9-16 12:15
-// @param    ctx *gin.Context       接收一个上下文
-// @return   void
-func isEmailExist(db *gorm.DB, email string) bool {
-	var user model.User
-	db.Where("email = ?", email).First(&user)
-	return user.ID != 0
 }
 
 // @title    Info

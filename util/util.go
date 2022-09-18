@@ -5,9 +5,12 @@
 package util
 
 import (
+	"Essential/model"
 	"math/rand"
 	"regexp"
 	"time"
+
+	"github.com/jinzhu/gorm"
 )
 
 // @title    RandomString
@@ -72,4 +75,15 @@ func VerifyIconFormat(Icon string) bool {
 
 	reg := regexp.MustCompile(regular)
 	return reg.MatchString(Icon)
+}
+
+// @title    isEmailExist
+// @description   查看email是否在数据库中存在
+// @auth      MGAronya（张健）       2022-9-16 12:15
+// @param    ctx *gin.Context       接收一个上下文
+// @return   void
+func IsEmailExist(db *gorm.DB, email string) bool {
+	var user model.User
+	db.Where("email = ?", email).First(&user)
+	return user.ID != 0
 }

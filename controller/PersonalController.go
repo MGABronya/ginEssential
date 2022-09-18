@@ -70,6 +70,10 @@ func PersonalUpdate(ctx *gin.Context) {
 		response.Response(ctx, 201, 201, nil, "邮箱格式错误")
 		return
 	}
+	if personalChange.Email != user.Email && util.IsEmailExist(db, personalChange.Email) {
+		response.Response(ctx, 201, 201, nil, "邮箱重复")
+		return
+	}
 	if personalChange.Telephone != "" && !util.VerifyMobileFormat(personalChange.Telephone) {
 		response.Response(ctx, 201, 201, nil, "手机号格式错误")
 		return
