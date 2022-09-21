@@ -47,12 +47,14 @@ func (a ArticleController) Create(ctx *gin.Context) {
 
 	// TODO 创建Article
 	article := model.Article{
-		UserId:  user.(model.User).ID,
-		Title:   requestArticle.Title,
-		Content: requestArticle.Content,
-		Icon:    user.(model.User).Icon,
-		Name:    user.(model.User).Name,
-		Email:   user.(model.User).Email,
+		UserId:   user.(model.User).ID,
+		Title:    requestArticle.Title,
+		Content:  requestArticle.Content,
+		ResLong:  requestArticle.ResLong,
+		ResShort: requestArticle.ResShort,
+		Icon:     user.(model.User).Icon,
+		Name:     user.(model.User).Name,
+		Email:    user.(model.User).Email,
 	}
 
 	// TODO 插入数据

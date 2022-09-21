@@ -23,6 +23,9 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 	// TODO 用户的注册路由
 	r.POST("/regist", controller.Register)
 
+	// TODO 用户的邮箱验证
+	r.GET("/verify/:id", controller.VerifyEmail)
+
 	// TODO 用户的登录路由
 	r.POST("/login", controller.Login)
 
@@ -88,6 +91,23 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 
 	// TODO 跟帖的创建路由
 	postRoutes.POST("/:id", postController.ThreadCreate)
+
+	// TODO 背景图片的路由分组
+	backgroundRoutes := r.Group("/background")
+
+	// TODO 添加中间件
+	backgroundRoutes.Use(middleware.AuthMiddleware())
+
+	backgroundController := controller.NewBackGroundController()
+
+	// TODO 查看用户使用的背景图片
+	backgroundRoutes.GET("/show", backgroundController.Show)
+
+	// TODO 查看用户选择新的背景图片
+	backgroundRoutes.GET("/update/:id", backgroundController.Update)
+
+	// TODO 用户上传自己的用户图片
+	backgroundRoutes.POST("/create", backgroundController.Create)
 
 	return r
 }

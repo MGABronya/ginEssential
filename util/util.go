@@ -5,12 +5,17 @@
 package util
 
 import (
+	"Essential/common"
 	"Essential/model"
+	"context"
+	"fmt"
 	"math/rand"
+	"net/smtp"
 	"regexp"
 	"time"
 
 	"github.com/jinzhu/gorm"
+	"github.com/jordan-wright/email"
 )
 
 // @title    RandomString
@@ -86,4 +91,56 @@ func IsEmailExist(db *gorm.DB, email string) bool {
 	var user model.User
 	db.Where("email = ?", email).First(&user)
 	return user.ID != 0
+}
+
+var ctx context.Context = context.Background()
+
+// @title    SendEmailValidate
+// @description   发送验证邮件
+// @auth      MGAronya（张健）       2022-9-16 12:15
+// @param    em []string       接收一个邮箱字符串
+// @return   string, error     返回验证码和error值
+func SendEmailValidate(em []string) (string, error) {
+	mod := `
+	尊敬的%s，您好！
+
+	您于 %s 提交的邮箱验证，本次验证码为%s，为了保证账号安全，验证码有效期为5分钟。请确认为本人操作，切勿向他人泄露，感谢您的理解与使用。
+	此邮箱为系统邮箱，请勿回复。
+
+`
+	e := email.NewEmail()
+	e.From = "mgAronya <2829214609@qq.com>"
+	e.To = em
+	// TODO 生成6位随机验证码
+	rnd := rand.New(rand.NewSource(time.Now().UnixNano()))
+	vCode := fmt.Sprintf("%06v", rnd.Int31n(1000000))
+	t := time.Now().Format("2006-01-02 15:04:05")
+	// TODO 设置文件发送的内容
+	content := fmt.Sprintf(mod, em[0], t, vCode)
+	e.Text = []byte(content)
+	// TODO 设置服务器相关的配置
+	err := e.Send("smtp.qq.com:25", smtp.PlainAuth("", "2829214609@qq.com", "rmdtxokuuqyrdgii", "smtp.qq.com"))
+	return vCode, err
+}
+
+// @title    IsEmailPass
+// @description   验证邮箱是否通过
+// @auth      MGAronya（张健）       2022-9-16 12:15
+// @param    em []string       接收一个邮箱字符串
+// @return   string, error     返回验证码和error值
+func IsEmailPass(email string, vertify string) bool {
+	client := common.GetRedisClient()
+	V, _ := client.Get(ctx, email).Result()
+	return V == vertify
+}
+
+// @title    SetRedis
+// @description   设置验证码，并令其存活五分钟
+// @auth      MGAronya（张健）       2022-9-16 12:15
+// @param    email string, v string       接收一个邮箱和一个验证码
+// @return   void
+func SetRedis(email string, v string) {
+	client := common.GetRedisClient()
+
+	client.Set(ctx, email, v, 300*time.Second)
 }

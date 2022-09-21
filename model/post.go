@@ -15,6 +15,8 @@ type Post struct {
 	UserId    uint      `json:"user_id" gorm:"not null"`                // 作者的id
 	Title     string    `json:"title" gorm:"type:varchar(50);not null"` // 帖子的标题
 	Content   string    `json:"content" gorm:"type:text;not null"`      // 帖子的内容
+	ResLong   string    `json:"res_long" gorm:"type:text;not null"`     // 备用长文本
+	ResShort  string    `json:"res_short" gorm:"type:text;not null"`    // 备用短文本
 	CreatedAt Time      `json:"created_at" gorm:"type:timestamp"`       // 帖子的创建时间
 	UpdatedAt Time      `json:"updated_at" gorm:"type:timestamp"`       // 帖子的更新时间
 	Name      string    `json:"name" gorm:"type:varchar(50)"`           // 帖子作者的名称

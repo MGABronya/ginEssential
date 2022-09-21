@@ -19,4 +19,5 @@ type User struct {
 	Sex        bool   `gorm:"type:boolean"`                     // 性别
 	Address    string `gorm:"type:varchar(20)"`                 // 地址
 	Hobby      string `gorm:"type:varchar(50)"`                 // 爱好
+	BackGround string `gorm:"type:varchar(50)"`                 // 这里的BackGround存储的是图像文件的地址
 }

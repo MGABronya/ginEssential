@@ -47,12 +47,14 @@ func (p PostController) Create(ctx *gin.Context) {
 
 	// TODO 创建Post
 	post := model.Post{
-		UserId:  user.(model.User).ID,
-		Title:   requestPost.Title,
-		Content: requestPost.Content,
-		Icon:    user.(model.User).Icon,
-		Name:    user.(model.User).Name,
-		Email:   user.(model.User).Email,
+		UserId:   user.(model.User).ID,
+		Title:    requestPost.Title,
+		Content:  requestPost.Content,
+		ResLong:  requestPost.ResLong,
+		ResShort: requestPost.ResShort,
+		Icon:     user.(model.User).Icon,
+		Name:     user.(model.User).Name,
+		Email:    user.(model.User).Email,
 	}
 
 	// TODO 插入数据
@@ -92,12 +94,14 @@ func (p PostController) ThreadCreate(ctx *gin.Context) {
 
 	// TODO 创建Thread
 	thread := model.Thread{
-		UserId:  user.(model.User).ID,
-		PostId:  ctx.Params.ByName("id"),
-		Content: requestThread.Content,
-		Icon:    user.(model.User).Icon,
-		Name:    user.(model.User).Name,
-		Email:   user.(model.User).Email,
+		UserId:   user.(model.User).ID,
+		PostId:   ctx.Params.ByName("id"),
+		Content:  requestThread.Content,
+		ResLong:  requestThread.ResLong,
+		ResShort: requestThread.ResShort,
+		Icon:     user.(model.User).Icon,
+		Name:     user.(model.User).Name,
+		Email:    user.(model.User).Email,
 	}
 
 	// TODO 插入数据
@@ -147,6 +151,8 @@ func (p PostController) Update(ctx *gin.Context) {
 
 		var requestPost vo.CreatePostRequest
 		requestPost.Content = requestPT.Content
+		requestPost.ResLong = requestPT.ResLong
+		requestPost.ResShort = requestPT.ResShort
 		requestPost.Title = requestPT.Title
 
 		// TODO 更新帖子
@@ -170,6 +176,8 @@ func (p PostController) Update(ctx *gin.Context) {
 
 		var requestThread vo.CreateThreadRequest
 		requestThread.Content = requestPT.Content
+		requestThread.ResLong = requestPT.ResLong
+		requestThread.ResShort = requestPT.ResShort
 
 		// TODO 更新帖子
 		if err := p.DB.Model(&thread).Update(requestThread).Error; err != nil {

@@ -9,8 +9,12 @@ require (
 )
 
 require (
+	github.com/cespare/xxhash/v2 v2.1.2 // indirect
+	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
+	github.com/garyburd/redigo v1.6.4 // indirect
 	github.com/goccy/go-json v0.9.7 // indirect
-	golang.org/x/net v0.0.0-20220412020605-290c469a71a5 // indirect
+	github.com/jordan-wright/email v4.0.1-0.20210109023952-943e75fe5223+incompatible // indirect
+	golang.org/x/net v0.0.0-20220425223048-2871e0cb64e4 // indirect
 )
 
 require (
@@ -21,6 +25,9 @@ require (
 	github.com/go-playground/locales v0.14.0 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect
 	github.com/go-playground/validator/v10 v10.10.1 // indirect
+	github.com/go-redis/redis v6.15.9+incompatible
+	github.com/go-redis/redis/v8 v8.11.5
+	github.com/go-redis/redis/v9 v9.0.0-beta.2
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect

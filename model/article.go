@@ -15,6 +15,8 @@ type Article struct {
 	UserId    uint      `json:"user_id" gorm:"not null"`                // 文章的作者id
 	Title     string    `json:"title" gorm:"type:varchar(50);not null"` // 文章的标题
 	Content   string    `json:"content" gorm:"type:text;not null"`      // 文章的内容
+	ResLong   string    `json:"res_long" gorm:"type:text;not null"`     // 备用长文本
+	ResShort  string    `json:"res_short" gorm:"type:text;not null"`    // 备用短文本
 	CreatedAt Time      `json:"created_at" gorm:"type:timestamp"`       // 文章的创建日期
 	UpdatedAt Time      `json:"updated_at" gorm:"type:timestamp"`       // 文章的更新日期
 	Name      string    `json:"name" gorm:"type:varchar(50)"`           // 作者的名称

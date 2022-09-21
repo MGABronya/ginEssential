@@ -1,5 +1,5 @@
 // @Title  database
-// @Description  该文件用于初始化数据库，以及包装一个向外提供数据库的功能
+// @Description  该文件用于初始化mysql数据库，以及包装一个向外提供数据库的功能
 // @Author  MGAronya（张健）
 // @Update  MGAronya（张健）  2022-9-16 0:33
 package common

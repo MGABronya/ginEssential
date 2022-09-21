@@ -10,6 +10,7 @@ import (
 	"Essential/model"
 	"Essential/response"
 	"Essential/util"
+	"Essential/vo"
 	"log"
 
 	"math/rand"
@@ -28,7 +29,7 @@ import (
 // @return   void
 func Register(ctx *gin.Context) {
 	DB := common.GetDB()
-	var requestUser = model.User{}
+	var requestUser = vo.UserRequest{}
 	ctx.Bind(&requestUser)
 	// TODO 获取参数
 	email := requestUser.Email
@@ -56,6 +57,12 @@ func Register(ctx *gin.Context) {
 		return
 	}
 
+	// TODO 判断email是否通过验证
+	if !util.IsEmailPass(email, requestUser.Verify) {
+		response.Response(ctx, 201, 201, nil, "邮箱验证码错误")
+		return
+	}
+
 	// TODO 创建用户
 	hasedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
@@ -63,10 +70,11 @@ func Register(ctx *gin.Context) {
 		return
 	}
 	newUser := model.User{
-		Name:     name,
-		Email:    email,
-		Password: string(hasedPassword),
-		Icon:     "MGA" + strconv.Itoa(rand.Intn(9)+1) + ".jpg",
+		Name:       name,
+		Email:      email,
+		Password:   string(hasedPassword),
+		Icon:       "MGA" + strconv.Itoa(rand.Intn(9)+1) + ".jpg",
+		BackGround: "MGA" + strconv.Itoa(rand.Intn(9)+1) + ".jpg",
 	}
 	DB.Create(&newUser)
 	// TODO 发放token给前端
@@ -132,4 +140,33 @@ func Login(ctx *gin.Context) {
 func Info(ctx *gin.Context) {
 	user, _ := ctx.Get("user")
 	ctx.JSON(http.StatusOK, gin.H{"code": 200, "data": gin.H{"user": dto.ToUserDto(user.(model.User))}})
+}
+
+// @title    VerifyEmail
+// @description   进行邮箱验证码发送的函数
+// @auth      MGAronya（张健）       2022-9-16 12:15
+// @param    ctx *gin.Context       接收一个上下文
+// @return   void
+func VerifyEmail(ctx *gin.Context) {
+	email := ctx.Params.ByName("id")
+	// TODO 数据验证
+	if !util.VerifyEmailFormat(email) {
+		response.Response(ctx, 201, 201, nil, "邮箱格式错误")
+		return
+	}
+	// TODO 判断email是否存在
+	if util.IsEmailExist(common.GetDB(), email) {
+		response.Response(ctx, 201, 201, nil, "用户已经存在")
+		return
+	}
+	v, err := util.SendEmailValidate([]string{email})
+	if err != nil {
+		response.Response(ctx, 201, 201, nil, "邮箱验证码发送失败")
+		return
+	}
+	// 验证码存入redis 并设置过期时间5分钟
+	util.SetRedis(email, v)
+
+	// TODO 返回结果
+	response.Success(ctx, gin.H{"email": email}, "验证码请求成功")
 }

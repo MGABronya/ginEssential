@@ -21,7 +21,9 @@ import (
 func main() {
 	InitConfig()
 	db := common.InitDB()
+	client := common.InitRedis()
 	defer db.Close()
+	defer client.Close()
 	r := gin.Default()
 	r = CollectRoute(r)
 	port := viper.GetString("server.port")
