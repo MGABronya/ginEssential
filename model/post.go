@@ -19,9 +19,6 @@ type Post struct {
 	ResShort  string    `json:"res_short" gorm:"type:text;not null"`    // 备用短文本
 	CreatedAt Time      `json:"created_at" gorm:"type:timestamp"`       // 帖子的创建时间
 	UpdatedAt Time      `json:"updated_at" gorm:"type:timestamp"`       // 帖子的更新时间
-	Name      string    `json:"name" gorm:"type:varchar(50)"`           // 帖子作者的名称
-	Icon      string    `json:"icon" gorm:"type:varchar(50)"`           // 这里的Icon存储的是图像文件的地址
-	Email     string    `json:"email" gorm:"type:varchar(50);not null"` // 帖子作者的Email
 }
 
 // @title    BeforeCreate

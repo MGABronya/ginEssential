@@ -52,9 +52,6 @@ func (a ArticleController) Create(ctx *gin.Context) {
 		Content:  requestArticle.Content,
 		ResLong:  requestArticle.ResLong,
 		ResShort: requestArticle.ResShort,
-		Icon:     user.(model.User).Icon,
-		Name:     user.(model.User).Name,
-		Email:    user.(model.User).Email,
 	}
 
 	// TODO 插入数据
@@ -178,12 +175,20 @@ func (a ArticleController) PageList(ctx *gin.Context) {
 	var articles []model.Article
 	a.DB.Order("created_at desc").Offset((pageNum - 1) * pageSize).Limit(pageSize).Find(&articles)
 
+	// TODO 查询与之对应的用户列表
+	users := make([]dto.UserDto, len(articles))
+	for i, article := range articles {
+		var user model.User
+		a.DB.Where("id = ?", article.UserId).First(&user)
+		users[i] = dto.ToUserDto(user)
+	}
+
 	// TODO 记录的总条数
 	var total int
 	a.DB.Model(model.Article{}).Count(&total)
 
 	// TODO 返回数据
-	response.Success(ctx, gin.H{"data": articles, "total": total}, "成功")
+	response.Success(ctx, gin.H{"articles": articles, "users": users, "total": total}, "成功")
 }
 
 // @title    NewArticleController
