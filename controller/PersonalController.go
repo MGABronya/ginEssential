@@ -97,11 +97,6 @@ func PersonalUpdate(ctx *gin.Context) {
 
 	db.Save(&user)
 
-	// TODO 同时更新文章，帖子，跟帖中的缩率用户信息
-	db.Model(&model.Article{}).Where("user_id = ?", user.ID).Updates(model.Article{Name: user.Name, Email: user.Email})
-	db.Model(&model.Post{}).Where("user_id = ?", user.ID).Updates(model.Post{Name: user.Name, Email: user.Email})
-	db.Model(&model.Thread{}).Where("user_id = ?", user.ID).Updates(model.Thread{Name: user.Name, Email: user.Email})
-
 	response.Success(ctx, gin.H{"user": dto.ToUserDto(user)}, "更新成功")
 }
 

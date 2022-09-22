@@ -26,6 +26,12 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 	// TODO 用户的邮箱验证
 	r.GET("/verify/:id", controller.VerifyEmail)
 
+	// TODO 用户找回密码
+	r.POST("/security", controller.Security)
+
+	// TODO 用户更改密码
+	r.POST("/updatepass", controller.UpdatePass)
+
 	// TODO 用户的登录路由
 	r.POST("/login", controller.Login)
 
@@ -75,22 +81,43 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 	postController := controller.NewPostController()
 
 	// TODO 帖子的创建路由
-	postRoutes.POST("", postController.Create)
+	postRoutes.POST("/:id", postController.Create)
 
-	// TODO 帖子/跟帖的更新路由
+	// TODO 帖子的更新路由
 	postRoutes.PUT("/:id", postController.Update)
 
 	// TODO 帖子的查看路由
 	postRoutes.GET("/:id", postController.Show)
 
-	// TODO 帖子/跟帖的删除路由
+	// TODO 帖子的删除路由
 	postRoutes.DELETE("/:id", postController.Delete)
 
 	//TODO 帖子的列表路由
 	postRoutes.POST("/pagelist", postController.PageList)
 
-	// TODO 跟帖的创建路由
-	postRoutes.POST("/:id", postController.ThreadCreate)
+	// TODO 帖子的路由分组
+	threadRoutes := r.Group("/thread")
+
+	// TODO 添加中间件
+	threadRoutes.Use(middleware.AuthMiddleware())
+
+	// TODO 创建帖子controller
+	threadController := controller.NewThreadController()
+
+	// TODO 帖子的创建路由
+	threadRoutes.POST("", threadController.Create)
+
+	// TODO 帖子的更新路由
+	threadRoutes.PUT("/:id", threadController.Update)
+
+	// TODO 帖子的查看路由
+	threadRoutes.GET("/:id", threadController.Show)
+
+	// TODO 帖子的删除路由
+	threadRoutes.DELETE("/:id", threadController.Delete)
+
+	//TODO 帖子的列表路由
+	threadRoutes.POST("/pagelist", threadController.PageList)
 
 	// TODO 背景图片的路由分组
 	backgroundRoutes := r.Group("/background")
@@ -98,6 +125,7 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 	// TODO 添加中间件
 	backgroundRoutes.Use(middleware.AuthMiddleware())
 
+	// TODO 背景图片的controller
 	backgroundController := controller.NewBackGroundController()
 
 	// TODO 查看用户使用的背景图片

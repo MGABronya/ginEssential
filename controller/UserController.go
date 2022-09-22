@@ -142,6 +142,38 @@ func Info(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"code": 200, "data": gin.H{"user": dto.ToUserDto(user.(model.User))}})
 }
 
+// @title    Security
+// @description   进行密码找回的函数
+// @auth      MGAronya（张健）       2022-9-16 12:15
+// @param    ctx *gin.Context       接收一个上下文
+// @return   void
+func Security(ctx *gin.Context) {
+	// TODO 数据验证
+	DB := common.GetDB()
+	var requestUser = vo.UserRequest{}
+	ctx.Bind(&requestUser)
+	if !util.VerifyEmailFormat(requestUser.Email) {
+		response.Response(ctx, 201, 201, nil, "邮箱格式错误")
+		return
+	}
+	// TODO 判断email是否存在
+	if !util.IsEmailExist(DB, requestUser.Email) {
+		response.Response(ctx, 201, 201, nil, "用户不存在")
+		return
+	}
+
+	// TODO 判断email是否通过验证
+	if !util.IsEmailPass(requestUser.Email, requestUser.Verify) {
+		response.Response(ctx, 201, 201, nil, "邮箱验证码错误")
+		return
+	}
+
+	err := util.SendEmailPass([]string{requestUser.Email})
+
+	// TODO 返回结果
+	response.Success(ctx, nil, err)
+}
+
 // @title    VerifyEmail
 // @description   进行邮箱验证码发送的函数
 // @auth      MGAronya（张健）       2022-9-16 12:15
@@ -169,4 +201,45 @@ func VerifyEmail(ctx *gin.Context) {
 
 	// TODO 返回结果
 	response.Success(ctx, gin.H{"email": email}, "验证码请求成功")
+}
+
+// @title    UpdatePass
+// @description   进行密码修改的函数
+// @auth      MGAronya（张健）       2022-9-16 12:15
+// @param    ctx *gin.Context       接收一个上下文
+// @return   void
+func UpdatePass(ctx *gin.Context) {
+	// TODO 获取登录用户
+	tuser, _ := ctx.Get("user")
+	user := tuser.(model.User)
+
+	var pairString = vo.PairString{}
+	ctx.Bind(&pairString)
+
+	// TODO 获取参数
+	oldPass := pairString.First
+	newPass := pairString.Second
+
+	// TODO 判断密码是否正确
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(oldPass)); err != nil {
+		response.Fail(ctx, nil, "密码错误")
+		return
+	}
+
+	// TODO 创建密码哈希
+	hasedPassword, err := bcrypt.GenerateFromPassword([]byte(newPass), bcrypt.DefaultCost)
+
+	if err != nil {
+		response.Response(ctx, 201, 201, nil, "加密错误")
+		return
+	}
+
+	db := common.GetDB()
+
+	// TODO 更新密码
+	user.Password = string(hasedPassword)
+
+	db.Save(&user)
+
+	response.Success(ctx, nil, "密码修改成功")
 }
