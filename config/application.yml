@@ -1,0 +1,14 @@
+server:
+  port: 后端提供接口的端口号
+datasource:
+  driverName: mysql
+  host: mysql的IP地址
+  port: mysql端口号
+  database: mysql中数据库的名称
+  username: mysql账户
+  password: mysql密码
+  addredis: redis的服务端口
+  redisid: 选择的redis数据库号
+  redispass: redis密码
+  charset: utf8
+  loc: Asia/Shanghai
