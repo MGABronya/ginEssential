@@ -63,6 +63,11 @@ func Register(ctx *gin.Context) {
 		return
 	}
 
+	if util.IsNameExist(DB, name) {
+		response.Response(ctx, 201, 201, nil, "用户名称已被注册")
+		return
+	}
+
 	// TODO 创建用户
 	hasedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
@@ -184,11 +189,6 @@ func VerifyEmail(ctx *gin.Context) {
 	// TODO 数据验证
 	if !util.VerifyEmailFormat(email) {
 		response.Response(ctx, 201, 201, nil, "邮箱格式错误")
-		return
-	}
-	// TODO 判断email是否存在
-	if util.IsEmailExist(common.GetDB(), email) {
-		response.Response(ctx, 201, 201, nil, "用户已经存在")
 		return
 	}
 	v, err := util.SendEmailValidate([]string{email})

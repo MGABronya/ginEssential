@@ -16,6 +16,7 @@ import (
 
 	"github.com/jinzhu/gorm"
 	"github.com/jordan-wright/email"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // @title    RandomString
@@ -93,6 +94,17 @@ func IsEmailExist(db *gorm.DB, email string) bool {
 	return user.ID != 0
 }
 
+// @title    isNameExist
+// @description   查看name是否在数据库中存在
+// @auth      MGAronya（张健）       2022-9-16 12:15
+// @param    ctx *gin.Context       接收一个上下文
+// @return   void
+func IsNameExist(db *gorm.DB, name string) bool {
+	var user model.User
+	db.Where("name = ?", name).First(&user)
+	return user.ID != 0
+}
+
 var ctx context.Context = context.Background()
 
 // @title    SendEmailValidate
@@ -106,7 +118,6 @@ func SendEmailValidate(em []string) (string, error) {
 
 	您于 %s 提交的邮箱验证，本次验证码为%s，为了保证账号安全，验证码有效期为5分钟。请确认为本人操作，切勿向他人泄露，感谢您的理解与使用。
 	此邮箱为系统邮箱，请勿回复。
-
 `
 	e := email.NewEmail()
 	e.From = "mgAronya <2829214609@qq.com>"
@@ -123,6 +134,57 @@ func SendEmailValidate(em []string) (string, error) {
 	return vCode, err
 }
 
+// @title    SendEmailPass
+// @description   发送密码邮件
+// @auth      MGAronya（张健）       2022-9-16 12:15
+// @param    em []string       接收一个邮箱字符串
+// @return   string, error     返回验证码和error值
+func SendEmailPass(em []string) string {
+	mod := `
+	尊敬的%s，您好！
+
+	您于 %s 提交的邮箱验证，已经将密码重置为%s，为了保证账号安全。切勿向他人泄露，并尽快更改密码，感谢您的理解与使用。
+	此邮箱为系统邮箱，请勿回复。
+`
+	e := email.NewEmail()
+	e.From = "mgAronya <2829214609@qq.com>"
+	e.To = em
+	// TODO 生成8位随机密码
+	rnd := rand.New(rand.NewSource(time.Now().UnixNano()))
+	password := fmt.Sprintf("%08v", rnd.Int31n(100000000))
+	t := time.Now().Format("2006-01-02 15:04:05")
+
+	db := common.GetDB()
+
+	// TODO 创建密码哈希
+	hasedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+
+	if err != nil {
+		return "密码加密失败"
+	}
+
+	// TODO 更新密码
+	err = db.Model(&model.User{}).Where("email = ?", em[0]).Update(model.User{
+		Password: string(hasedPassword),
+	}).Error
+
+	if err != nil {
+		return "密码更新失败"
+	}
+
+	// TODO 设置文件发送的内容
+	content := fmt.Sprintf(mod, em[0], t, password)
+	e.Text = []byte(content)
+	// TODO 设置服务器相关的配置
+	err = e.Send("smtp.qq.com:25", smtp.PlainAuth("", "2829214609@qq.com", "rmdtxokuuqyrdgii", "smtp.qq.com"))
+
+	if err != nil {
+		return "邮件发送失败"
+	}
+
+	return "密码已重置"
+}
+
 // @title    IsEmailPass
 // @description   验证邮箱是否通过
 // @auth      MGAronya（张健）       2022-9-16 12:15
@@ -130,7 +192,10 @@ func SendEmailValidate(em []string) (string, error) {
 // @return   string, error     返回验证码和error值
 func IsEmailPass(email string, vertify string) bool {
 	client := common.GetRedisClient()
-	V, _ := client.Get(ctx, email).Result()
+	V, err := client.Get(ctx, email).Result()
+	if err != nil {
+		return false
+	}
 	return V == vertify
 }
 
