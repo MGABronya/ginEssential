@@ -199,12 +199,12 @@ func IsEmailPass(email string, vertify string) bool {
 	return V == vertify
 }
 
-// @title    SetRedis
+// @title    SetRedisEmail
 // @description   设置验证码，并令其存活五分钟
 // @auth      MGAronya（张健）       2022-9-16 12:15
 // @param    email string, v string       接收一个邮箱和一个验证码
 // @return   void
-func SetRedis(email string, v string) {
+func SetRedisEmail(email string, v string) {
 	client := common.GetRedisClient()
 
 	client.Set(ctx, email, v, 300*time.Second)
