@@ -30,7 +30,7 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 	r.POST("/security", controller.Security)
 
 	// TODO 用户更改密码
-	r.POST("/updatepass", controller.UpdatePass)
+	r.POST("/updatepass", middleware.AuthMiddleware(), controller.UpdatePass)
 
 	// TODO 用户的登录路由
 	r.POST("/login", controller.Login)
