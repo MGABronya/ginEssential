@@ -5,6 +5,7 @@
 package controller
 
 import (
+	Buil "Blog/util"
 	"Essential/common"
 	"Essential/dto"
 	"Essential/model"
@@ -157,7 +158,7 @@ func (t ThreadController) Delete(ctx *gin.Context) {
 		return
 	}
 
-	if userId != thread.UserId {
+	if Buil.GetH("permission", strconv.Itoa(int(userId)))[0] < '4' && userId != thread.UserId {
 		response.Fail(ctx, nil, "帖子不属于您，请勿非法操作")
 		return
 	}

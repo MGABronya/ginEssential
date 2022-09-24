@@ -5,6 +5,7 @@
 package controller
 
 import (
+	Buil "Blog/util"
 	"Essential/common"
 	"Essential/dto"
 	"Essential/model"
@@ -82,6 +83,8 @@ func Register(ctx *gin.Context) {
 		BackGround: "MGA" + strconv.Itoa(rand.Intn(9)+1) + ".jpg",
 	}
 	DB.Create(&newUser)
+	// TODO 设置用户权限
+	Buil.SetH("permission", strconv.Itoa(int(newUser.ID)), "2")
 	// TODO 发放token给前端
 	token, err := common.ReleaseToken(newUser)
 	if err != nil {
@@ -197,7 +200,7 @@ func VerifyEmail(ctx *gin.Context) {
 		return
 	}
 	// 验证码存入redis 并设置过期时间5分钟
-	util.SetRedis(email, v)
+	util.SetRedisEmail(email, v)
 
 	// TODO 返回结果
 	response.Success(ctx, gin.H{"email": email}, "验证码请求成功")

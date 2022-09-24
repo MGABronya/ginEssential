@@ -5,6 +5,7 @@
 package controller
 
 import (
+	Buil "Blog/util"
 	"Essential/common"
 	"Essential/dto"
 	"Essential/model"
@@ -160,7 +161,7 @@ func (p PostController) Delete(ctx *gin.Context) {
 	}
 
 	// TODO 判断当前用户是否为帖子的作者
-	if userId != post.UserId {
+	if Buil.GetH("permission", strconv.Itoa(int(userId)))[0] < '4' && userId != post.UserId {
 		response.Fail(ctx, nil, "帖子不属于您，请勿非法操作")
 		return
 	}

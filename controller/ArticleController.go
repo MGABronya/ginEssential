@@ -5,6 +5,7 @@
 package controller
 
 import (
+	Buil "Blog/util"
 	"Essential/common"
 	"Essential/dto"
 	"Essential/model"
@@ -151,7 +152,7 @@ func (a ArticleController) Delete(ctx *gin.Context) {
 	userId := user.(model.User).ID
 
 	// TODO 查看用户是否有操作文章的权力
-	if userId != article.UserId {
+	if Buil.GetH("permission", strconv.Itoa(int(userId)))[0] < '4' && userId != article.UserId {
 		response.Fail(ctx, nil, "文章不属于您，请勿非法操作")
 		return
 	}
