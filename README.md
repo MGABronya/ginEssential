@@ -8,7 +8,7 @@
 
     **方法类型：POST**
 
-    请求参数：Body部分，form-data类型，接收四个字符串分别为Email，Password，Name，Verify。其中Email需要符合邮箱格式，Password最少需要六位，Name最多为20位长度，Verify必须与邮箱验证码相同。
+    请求参数：Body部分，form-data类型，接收四个字符串分别为Email，Password，Name，Verify。其中Email需要符合邮箱格式，Password最少需要六位，Name最多为20位长度，Verify必须与邮箱验证码相同，注意，用户的邮箱和名称均不能重复。
 
     可能的返回值：成功则返回200与token，失败则返回其他值，msg中将会给出失败原因
 
@@ -18,7 +18,7 @@
 
     **方法类型：GET**
 
-    请求参数：Body部分，form-data类型，接收三个字符串分别为Email，Password。其中Email需要符合邮箱格式，Password最少需要六位。
+    请求参数：需要在接口地址部分（:id）给出用户邮箱
 
     返回值：成功则返回200并向相应邮箱发送验证邮件，失败则返回其他值，msg中将会给出失败原因
 
