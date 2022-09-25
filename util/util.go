@@ -5,10 +5,10 @@
 package util
 
 import (
-	"Essential/common"
-	"Essential/model"
 	"context"
 	"fmt"
+	"ginEssential/common"
+	"ginEssential/model"
 	"math/rand"
 	"net/smtp"
 	"regexp"
@@ -191,7 +191,7 @@ func SendEmailPass(em []string) string {
 // @param    em []string       接收一个邮箱字符串
 // @return   string, error     返回验证码和error值
 func IsEmailPass(email string, vertify string) bool {
-	client := common.GetRedisClient()
+	client := common.GetRedisClient(0)
 	V, err := client.Get(ctx, email).Result()
 	if err != nil {
 		return false
@@ -205,7 +205,7 @@ func IsEmailPass(email string, vertify string) bool {
 // @param    email string, v string       接收一个邮箱和一个验证码
 // @return   void
 func SetRedisEmail(email string, v string) {
-	client := common.GetRedisClient()
+	client := common.GetRedisClient(0)
 
 	client.Set(ctx, email, v, 300*time.Second)
 }

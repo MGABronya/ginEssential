@@ -5,8 +5,8 @@
 package main
 
 import (
-	"Essential/controller"
-	"Essential/middleware"
+	"ginEssential/controller"
+	"ginEssential/middleware"
 
 	"github.com/gin-gonic/gin"
 )
@@ -38,6 +38,15 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 	// TODO 用户的个人页面路由
 	r.GET("/personal", middleware.AuthMiddleware(), controller.PersonalPage)
 
+	// TODO 用户的个人文章路由
+	r.GET("/personalarticles", middleware.AuthMiddleware(), controller.PersonalPageArticles)
+
+	// TODO 用户的个人帖子路由
+	r.GET("/personalposts", middleware.AuthMiddleware(), controller.PersonalPagePosts)
+
+	// TODO 用户的个人跟帖路由
+	r.GET("/personalthreads", middleware.AuthMiddleware(), controller.PersonalPageThreads)
+
 	// TODO 用户的个人页面信息更新路由
 	r.PUT("/personal", middleware.AuthMiddleware(), controller.PersonalUpdate)
 
@@ -46,6 +55,18 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 
 	// TODO 个人信息展示路由
 	r.GET("/personal/:id", middleware.AuthMiddleware(), controller.PersonalShow)
+
+	// TODO 个人文章展示路由
+	r.GET("/personalarticles/:id", middleware.AuthMiddleware(), controller.PersonalShowArticles)
+
+	// TODO 个人帖子展示路由
+	r.GET("/personalposts/:id", middleware.AuthMiddleware(), controller.PersonalShowPosts)
+
+	// TODO 个人跟帖展示路由
+	r.GET("/personalthreads/:id", middleware.AuthMiddleware(), controller.PersonalShowThreads)
+
+	// TODO 查找一组用户的信息
+	r.POST("/personalusers", middleware.AuthMiddleware(), controller.PersonalShowUsers)
 
 	// TODO 文章路由分组
 	articleRoutes := r.Group("/article")
@@ -95,29 +116,29 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 	//TODO 帖子的列表路由
 	postRoutes.POST("/pagelist", postController.PageList)
 
-	// TODO 帖子的路由分组
+	// TODO 跟帖的路由分组
 	threadRoutes := r.Group("/thread")
 
 	// TODO 添加中间件
 	threadRoutes.Use(middleware.AuthMiddleware())
 
-	// TODO 创建帖子controller
+	// TODO 创建跟帖controller
 	threadController := controller.NewThreadController()
 
-	// TODO 帖子的创建路由
+	// TODO 跟帖的创建路由
 	threadRoutes.POST("", threadController.Create)
 
-	// TODO 帖子的更新路由
+	// TODO 跟帖的更新路由
 	threadRoutes.PUT("/:id", threadController.Update)
 
-	// TODO 帖子的查看路由
+	// TODO 跟帖的查看路由
 	threadRoutes.GET("/:id", threadController.Show)
 
-	// TODO 帖子的删除路由
+	// TODO 跟帖的删除路由
 	threadRoutes.DELETE("/:id", threadController.Delete)
 
-	//TODO 帖子的列表路由
-	threadRoutes.POST("/pagelist", threadController.PageList)
+	//TODO 跟帖的列表路由
+	threadRoutes.GET("/pagelist/:id", threadController.PageList)
 
 	// TODO 背景图片的路由分组
 	backgroundRoutes := r.Group("/background")

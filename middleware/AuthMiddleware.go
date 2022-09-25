@@ -5,9 +5,9 @@
 package middleware
 
 import (
-	"Essential/common"
-	"Essential/model"
 	"fmt"
+	"ginEssential/common"
+	"ginEssential/model"
 	"strings"
 
 	"github.com/gin-gonic/gin"

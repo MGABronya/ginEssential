@@ -5,8 +5,8 @@
 package middleware
 
 import (
-	"Essential/response"
 	"fmt"
+	"ginEssential/response"
 
 	"github.com/gin-gonic/gin"
 )

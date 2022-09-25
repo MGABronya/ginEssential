@@ -1,4 +1,4 @@
-# Essential
+# ginEssential
 
 - ## 用户相关
 
@@ -62,6 +62,46 @@
 
     返回值：返回用户的一些个人信息，格式为json包含Name,Email,Telephone,Blog,QQ,Sex,Address,Hobby,Icon,BackGround，除Sex为bool类型外，其它均为字符串类型，其中Icon和BackGround表示头像和背景图片的文件名。
 
+  - **接口地址：/personalarticles**
+
+    **功能：获取当前用户的文章列表**
+
+    **方法类型：GET**
+
+    请求参数：Authorization中的Bearer Token中提供注册、登录时给出的token。
+
+    返回值：返回中包含一个articles数组，其中包含了该用户所有文章的信息。
+
+  - **接口地址：/personalposts**
+
+    **功能：获取当前用户的帖子列表**
+
+    **方法类型：GET**
+
+    请求参数：Authorization中的Bearer Token中提供注册、登录时给出的token。
+
+    返回值：返回中包含一个posts数组，其中包含了该用户所有帖子的信息。
+
+  - **接口地址：/personalthreads**
+
+    **功能：获取当前用户的跟帖列表**
+
+    **方法：GET**
+
+    请求参数：Authorization中的Bearer Token中提供注册、登录时给出的token。
+
+    返回值：返回中包含一个threads数组，其中包含了该用户所有跟帖的信息。
+
+  - **接口地址：/personalusers**
+
+    **功能：提供一组userid，返回一组对应的用户信息**
+
+    **方法：POST**
+
+    请求参数：在Body，raw格式给出json类型数据包含一个userId，userId为一个数组，数组中包含了需要查询的user组。
+
+    返回值：返回一个users数组，其中的用户信息与userId数组一一对应。
+
   - **接口地址：/personal**
 
     **功能：用户修改个人信息**
@@ -121,6 +161,36 @@
     请求参数：Authorization中的Bearer Token中提供注册、登录时给出的token。被查看用户的id（接口地址中的id）
 
     返回值：成功时返回被查看用户的信息，失败时给出失败原因。
+    
+  - **接口地址：/personalarticles/:id**
+
+    **功能：展示指定用户的文章列表**
+
+    **方法：GET**
+
+    请求参数：指定用户的用户id（即接口地址id部分）
+
+    返回值：返回一个articles表示指定用户的文章列表
+
+  - **接口地址：/personalposts/:id**
+
+    **功能：展示指定用户的帖子列表**
+
+    **方法：GET**
+
+    请求参数：指定用户的用户id（即接口地址id部分）
+
+    返回值：返回一个posts表示指定用户的帖子列表
+
+  - **接口地址：/personalthreads/:id**
+
+    **功能：展示指定用户的跟帖列表**
+
+    **方法：GET**
+
+    请求参数：指定用户的用户id（即接口地址id部分）
+
+    返回值：返回一个posts表示指定用户的跟帖列表
 
 - ## 文章相关
 
@@ -152,7 +222,7 @@
 
     请求参数：文章的uuid（在接口地址的id处）。uthorization中的Bearer Token中提供注册、登录时给出的token。在Body，raw格式给出json类型数据包含title、content、res_long(可选)、res_short（可选），其中title表示文章标题，content表示文章内容，res_long表示长文本备用键值，res_short表示短文本备用键值。
 
-    返回值：成功更新文章时，将会以json格式给出文章article和作者user，article中包含id,user_id,content,create_at,updated_at,res_short,res_long。user中包含Name,Email,Telephone,Blog,QQ,Sex,Address,Hobby,Icon。如果失败则返回失败原因。
+    返回值：成功更新文章时，将会以json格式给出文章article和，article中包含id,user_id,content,create_at,updated_at,res_short,res_long。如果失败则返回失败原因。
 
   - **接口地址：/article/:id**
 
@@ -162,7 +232,7 @@
 
     请求参数：文章的uuid（在接口地址的id处）。uthorization中的Bearer Token中提供注册、登录时给出的token。
 
-    返回值：成功删除文章时，将会以json格式给出文章article和作者user，article中包含id,user_id,content,create_at,updated_at,res_short,res_long。user中包含Name,Email,Telephone,Blog,QQ,Sex,Address,Hobby,Icon。如果失败则返回失败原因。
+    返回值：成功删除文章时，将会以json格式给出文章article，article中包含id,user_id,content,create_at,updated_at,res_short,res_long。如果失败则返回失败原因。
 
   - **接口地址：/article/pagelist**
 
@@ -172,7 +242,7 @@
 
     请求参数：uthorization中的Bearer Token中提供注册、登录时给出的token。在Params处提供pageNum（表示第几页，默认值为1）和pageSize（表示一页多少篇文章，默认值为20）。
 
-    返回值：成功时，以json格式返回两个数组articles和users，articles返回了相应列表的文章信息（按照创建时间排序，越早创建排序越前），users中的用户信息与articles中的作者id一一对应。如果失败则返回失败原因。
+    返回值：成功时，以json格式返回两个数组articles，articles返回了相应列表的文章信息（按照创建时间排序，越早创建排序越前），如果失败则返回失败原因。
 
 - ## 帖子相关
 
@@ -204,7 +274,7 @@
 
     请求参数：thorization中的Bearer Token中提供注册、登录时给出的token。在接口地址的id中给出帖子的id。
 
-    返回值：成功时返回帖子post，帖子的作者user，帖子的跟帖threads，跟帖的作者们users。post中包含了id,user_id,title,content,res_long,res_short,create_at,updated_at，作者user包含了Name,Email,Telephone,Blog,QQ,Sex,Address,Hobby,Icon,BackGround。threads是个数组，包含了多个thread，每个thread包含了id,user_id,post_id,title,content,res_long,res_short,create_at,updated_at。users是个数组，包含了多个user，与threads数组中的user_id一一对应。
+    返回值：成功时返回帖子post，帖子的跟帖threads。post中包含了id,user_id,title,content,res_long,res_short,create_at,updated_at。threads是个数组，包含了多个thread，每个thread包含了id,user_id,post_id,title,content,res_long,res_short,create_at,updated_at。
 
   - **接口地址：/post/:id**
 
@@ -224,7 +294,7 @@
 
     请求参数：uthorization中的Bearer Token中提供注册、登录时给出的token。在Params处提供pageNum（表示第几页，默认值为1）和pageSize（表示一页多少篇帖子，默认值为20）。
 
-    返回值：成功时，以json格式返回两个数组posts和users，posts返回了相应列表的帖子信息（按照创建时间排序，越早创建排序越前），users中的用户信息与posts中的作者id一一对应。如果失败则返回失败原因。
+    返回值：成功时，以json格式返回两个数组posts，posts返回了相应列表的帖子信息（按照创建时间排序，越早创建排序越前）
 
 - ## 跟帖相关
 
@@ -256,7 +326,7 @@
 
     请求参数：thorization中的Bearer Token中提供注册、登录时给出的token。在接口地址的id中给出帖子的id。
 
-    返回值：成功时返回帖子thread，帖子的作者user，thread中包含了id,user_id,post_id,content,res_long,res_short,create_at,updated_at，作者user包含了Name,Email,Telephone,Blog,QQ,Sex,Address,Hobby,Icon,BackGround。
+    返回值：成功时返回帖子thread，thread中包含了id,user_id,post_id,content,res_long,res_short,create_at,updated_at
 
   - **接口地址：/thread/:id**
 
@@ -268,12 +338,12 @@
 
     返回值：成功时返回跟帖thread。失败时返回错误信息。
 
-  - **接口地址：/thread/pagelist**
+  - **接口地址：/thread/pagelist/:id**
 
     **功能：提供跟帖列表**
 
     **方法类型：POST**
 
-    请求参数：uthorization中的Bearer Token中提供注册、登录时给出的token。在Params处提供pageNum（表示第几页，默认值为1）和pageSize（表示一页多少篇跟帖，默认值为20）。
+    请求参数：uthorization中的Bearer Token中提供注册、登录时给出的token。在Params处提供pageNum（表示第几页，默认值为1）和pageSize（表示一页多少篇跟帖，默认值为20）,在接口id处给出帖子的id。
 
-    返回值：成功时，以json格式返回两个数组threads和users，threads返回了相应列表的跟帖信息（按照创建时间排序，越早创建排序越前），users中的用户信息与threads中的作者id一一对应。如果失败则返回失败原因。
+    返回值：成功时，以json格式返回两个数组threads，threads返回了相应列表的跟帖信息（按照创建时间排序，越早创建排序越前）

@@ -5,7 +5,7 @@
 package dto
 
 import (
-	"Essential/model"
+	"ginEssential/model"
 )
 
 // UserDto			定义了用户的基本信息
