@@ -5,13 +5,13 @@
 package controller
 
 import (
-	"Essential/common"
-	"Essential/dto"
-	"Essential/model"
-	"Essential/response"
-	"Essential/util"
-	"Essential/vo"
 	"fmt"
+	"ginEssential/common"
+	"ginEssential/dto"
+	"ginEssential/model"
+	"ginEssential/response"
+	"ginEssential/util"
+	"ginEssential/vo"
 	"log"
 	"net/http"
 	"os"
@@ -22,11 +22,24 @@ import (
 )
 
 // @title    PersonalPage
-// @description   提供用户的个人页面信息
+// @description   提供用户的个人信息
 // @auth      MGAronya（张健）       2022-9-16 12:15
 // @param    ctx *gin.Context       接收一个上下文
 // @return   void
 func PersonalPage(ctx *gin.Context) {
+	tuser, _ := ctx.Get("user")
+
+	user := tuser.(model.User)
+
+	ctx.JSON(http.StatusOK, gin.H{"code": 200, "data": gin.H{"user": dto.ToUserDto(user)}})
+}
+
+// @title    PersonalPageArticles
+// @description   提供用户的个人文章信息
+// @auth      MGAronya（张健）       2022-9-16 12:15
+// @param    ctx *gin.Context       接收一个上下文
+// @return   void
+func PersonalPageArticles(ctx *gin.Context) {
 	tuser, _ := ctx.Get("user")
 	db := common.GetDB()
 
@@ -37,17 +50,45 @@ func PersonalPage(ctx *gin.Context) {
 	// TODO 查看用户的所有文章
 	db.Order("created_at desc").Where("user_id = ?", user.ID).Find(&articles)
 
+	ctx.JSON(http.StatusOK, gin.H{"code": 200, "data": gin.H{"articles": articles}})
+}
+
+// @title    PersonalPagePosts
+// @description   提供用户的个人帖子信息
+// @auth      MGAronya（张健）       2022-9-16 12:15
+// @param    ctx *gin.Context       接收一个上下文
+// @return   void
+func PersonalPagePosts(ctx *gin.Context) {
+	tuser, _ := ctx.Get("user")
+	db := common.GetDB()
+
+	user := tuser.(model.User)
+
 	var posts []model.Post
 
 	// TODO 查看用户的所有帖子
 	db.Order("created_at desc").Where("user_id = ?", user.ID).Find(&posts)
+
+	ctx.JSON(http.StatusOK, gin.H{"code": 200, "data": gin.H{"posts": posts}})
+}
+
+// @title    PersonalPageThreads
+// @description   提供用户的个人帖跟帖信息
+// @auth      MGAronya（张健）       2022-9-16 12:15
+// @param    ctx *gin.Context       接收一个上下文
+// @return   void
+func PersonalPageThreads(ctx *gin.Context) {
+	tuser, _ := ctx.Get("user")
+	db := common.GetDB()
+
+	user := tuser.(model.User)
 
 	var threads []model.Thread
 
 	// TODO 查看用户的所有跟帖
 	db.Order("created_at desc").Where("user_id = ?", user.ID).Find(&threads)
 
-	ctx.JSON(http.StatusOK, gin.H{"code": 200, "data": gin.H{"user": dto.ToUserDto(user), "articles": articles, "posts": posts, "threads": threads}})
+	ctx.JSON(http.StatusOK, gin.H{"code": 200, "data": gin.H{"threads": threads}})
 }
 
 // @title    PersonalUpdate
@@ -158,11 +199,6 @@ func PersonalIcon(ctx *gin.Context) {
 
 	user.Icon = file.Filename
 
-	// TODO 更新用户简易信息
-	db.Model(&model.Article{}).Where("user_id = ?", user.ID).Update("icon", user.Icon)
-	db.Model(&model.Post{}).Where("user_id = ?", user.ID).Update("name", user.Icon)
-	db.Model(&model.Thread{}).Where("user_id = ?", user.ID).Update("name", user.Icon)
-
 	db.Save(&user)
 
 	response.Success(ctx, gin.H{"Icon": user.Icon}, "更新成功")
@@ -183,15 +219,96 @@ func PersonalShow(ctx *gin.Context) {
 		return
 	}
 
-	// TODO 查询用户的文章、帖子、跟帖
+	ctx.JSON(http.StatusOK, gin.H{"code": 200, "data": gin.H{"user": dto.ToUserDto(user)}})
+}
+
+// @title    PersonalShowArticles
+// @description   查看用户文章信息
+// @auth      MGAronya（张健）       2022-9-16 12:31
+// @param    ctx *gin.Context       接收一个上下文
+// @return   void
+func PersonalShowArticles(ctx *gin.Context) {
+	db := common.GetDB()
+	var user model.User
+
+	// TODO 查看用户是否存在
+	if db.Where("id = ?", ctx.Params.ByName("id")).First(&user).RecordNotFound() {
+		response.Fail(ctx, nil, "用户不存在")
+		return
+	}
+
+	// TODO 查询用户的文章
 	var articles []model.Article
 	db.Order("created_at desc").Where("user_id = ?", user.ID).Find(&articles)
+
+	ctx.JSON(http.StatusOK, gin.H{"code": 200, "data": gin.H{"articles": articles}})
+}
+
+// @title    PersonalShowPosts
+// @description   查看用户帖子信息
+// @auth      MGAronya（张健）       2022-9-16 12:31
+// @param    ctx *gin.Context       接收一个上下文
+// @return   void
+func PersonalShowPosts(ctx *gin.Context) {
+	db := common.GetDB()
+	var user model.User
+
+	// TODO 查看用户是否存在
+	if db.Where("id = ?", ctx.Params.ByName("id")).First(&user).RecordNotFound() {
+		response.Fail(ctx, nil, "用户不存在")
+		return
+	}
 
 	var posts []model.Post
 	db.Order("created_at desc").Where("user_id = ?", user.ID).Find(&posts)
 
+	ctx.JSON(http.StatusOK, gin.H{"code": 200, "data": gin.H{"posts": posts}})
+}
+
+// @title    PersonalShowThreads
+// @description   查看用户信息
+// @auth      MGAronya（张健）       2022-9-16 12:31
+// @param    ctx *gin.Context       接收一个上下文
+// @return   void
+func PersonalShowThreads(ctx *gin.Context) {
+	db := common.GetDB()
+	var user model.User
+
+	// TODO 查看用户是否存在
+	if db.Where("id = ?", ctx.Params.ByName("id")).First(&user).RecordNotFound() {
+		response.Fail(ctx, nil, "用户不存在")
+		return
+	}
+
 	var threads []model.Thread
 	db.Order("created_at desc").Where("user_id = ?", user.ID).Find(&threads)
 
-	ctx.JSON(http.StatusOK, gin.H{"code": 200, "data": gin.H{"user": dto.ToUserDto(user), "articles": articles, "posts": posts, "threads": threads}})
+	ctx.JSON(http.StatusOK, gin.H{"code": 200, "data": gin.H{"threads": threads}})
+}
+
+// @title    PersonalShowUsers
+// @description   查看一组用户信息
+// @auth      MGAronya（张健）       2022-9-16 12:31
+// @param    ctx *gin.Context       接收一个上下文
+// @return   void
+func PersonalShowUsers(ctx *gin.Context) {
+	db := common.GetDB()
+
+	var requestUsers vo.UsersRequest
+	// TODO 数据验证
+	if err := ctx.ShouldBind(&requestUsers); err != nil {
+		log.Print(err.Error())
+		response.Fail(ctx, nil, "数据验证错误")
+		return
+	}
+
+	// TODO 查询与之对应的用户列表
+	users := make([]dto.UserDto, len(requestUsers.UserId))
+	for i, userId := range requestUsers.UserId {
+		var user model.User
+		db.Where("id = ?", userId).First(&user)
+		users[i] = dto.ToUserDto(user)
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"code": 200, "data": gin.H{"users": users}})
 }

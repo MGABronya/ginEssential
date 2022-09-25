@@ -6,11 +6,10 @@ package controller
 
 import (
 	Buil "Blog/util"
-	"Essential/common"
-	"Essential/dto"
-	"Essential/model"
-	"Essential/response"
-	"Essential/vo"
+	"ginEssential/common"
+	"ginEssential/model"
+	"ginEssential/response"
+	"ginEssential/vo"
 	"log"
 	"strconv"
 
@@ -131,11 +130,8 @@ func (t ThreadController) Show(ctx *gin.Context) {
 		return
 	}
 
-	var user model.User
-	t.DB.Where("id = ?", thread.UserId).First(&user)
-
 	// TODO 返回数据
-	response.Success(ctx, gin.H{"thread": thread, "user": dto.ToUserDto(user)}, "成功")
+	response.Success(ctx, gin.H{"thread": thread}, "成功")
 }
 
 // @title    Delete
@@ -158,13 +154,22 @@ func (t ThreadController) Delete(ctx *gin.Context) {
 		return
 	}
 
-	if Buil.GetH("permission", strconv.Itoa(int(userId)))[0] < '4' && userId != thread.UserId {
+	if Buil.GetH(0, "permission", strconv.Itoa(int(userId)))[0] < '4' && userId != thread.UserId {
 		response.Fail(ctx, nil, "帖子不属于您，请勿非法操作")
 		return
 	}
 
 	// TODO 删除帖子
 	t.DB.Delete(&thread)
+
+	// TODO 移除收藏
+	for _, val := range Buil.MembersS(3, "taF"+threadId) {
+		Buil.RemS(3, "tFa"+val, threadId)
+	}
+	Buil.Del(3, "taF"+threadId)
+
+	// TODO 移除点赞
+	Buil.Del(3, "tiL"+threadId)
 
 	response.Success(ctx, gin.H{"thread": thread}, "删除成功")
 }
@@ -179,24 +184,18 @@ func (t ThreadController) PageList(ctx *gin.Context) {
 	pageNum, _ := strconv.Atoi(ctx.DefaultQuery("pageNum", "1"))
 	pageSize, _ := strconv.Atoi(ctx.DefaultQuery("pageSize", "20"))
 
+	postId := ctx.Params.ByName("id")
+
 	// TODO 分页
 	var threads []model.Thread
-	t.DB.Order("created_at desc").Offset((pageNum - 1) * pageSize).Limit(pageSize).Find(&threads)
-
-	// TODO 查询与之对应的用户列表
-	users := make([]dto.UserDto, len(threads))
-	for i, thread := range threads {
-		var user model.User
-		t.DB.Where("id = ?", thread.UserId).First(&user)
-		users[i] = dto.ToUserDto(user)
-	}
+	t.DB.Where("post_id = ?", postId).Order("created_at desc").Offset((pageNum - 1) * pageSize).Limit(pageSize).Find(&threads)
 
 	// TODO 记录的总条数
 	var total int
 	t.DB.Model(model.Post{}).Count(&total)
 
 	// TODO 返回数据
-	response.Success(ctx, gin.H{"threads": threads, "users": users, "total": total}, "成功")
+	response.Success(ctx, gin.H{"threads": threads, "total": total}, "成功")
 }
 
 // @title    NewThreadController

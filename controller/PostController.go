@@ -6,11 +6,10 @@ package controller
 
 import (
 	Buil "Blog/util"
-	"Essential/common"
-	"Essential/dto"
-	"Essential/model"
-	"Essential/response"
-	"Essential/vo"
+	"ginEssential/common"
+	"ginEssential/model"
+	"ginEssential/response"
+	"ginEssential/vo"
 	"log"
 	"strconv"
 
@@ -122,22 +121,11 @@ func (p PostController) Show(ctx *gin.Context) {
 		return
 	}
 
-	var user model.User
-	p.DB.Where("id = ?", post.UserId).First(&user)
-
 	var threads []model.Thread
 	p.DB.Order("created_at asc").Where("post_id = ?", post.ID).Find(&threads)
 
-	// TODO 查询与之对应的用户列表
-	users := make([]dto.UserDto, len(threads))
-	for i, thread := range threads {
-		var user model.User
-		p.DB.Where("id = ?", thread.UserId).First(&user)
-		users[i] = dto.ToUserDto(user)
-	}
-
 	// TODO 返回数据
-	response.Success(ctx, gin.H{"post": post, "user": dto.ToUserDto(user), "threads": threads, "users": users}, "成功")
+	response.Success(ctx, gin.H{"post": post, "threads": threads}, "成功")
 }
 
 // @title    Delete
@@ -161,9 +149,39 @@ func (p PostController) Delete(ctx *gin.Context) {
 	}
 
 	// TODO 判断当前用户是否为帖子的作者
-	if Buil.GetH("permission", strconv.Itoa(int(userId)))[0] < '4' && userId != post.UserId {
+	if Buil.GetH(0, "permission", strconv.Itoa(int(userId)))[0] < '4' && userId != post.UserId {
 		response.Fail(ctx, nil, "帖子不属于您，请勿非法操作")
 		return
+	}
+
+	// TODO 移除收藏
+	for _, val := range Buil.MembersS(3, "paF"+postId) {
+		Buil.RemS(3, "pFa"+val, postId)
+	}
+	Buil.Del(3, "paF"+postId)
+
+	// TODO 移除点赞
+	Buil.Del(3, "piL"+postId)
+
+	// TODO 移除标签
+	for _, val := range Buil.MembersS(3, "paL"+postId) {
+		Buil.RemS(3, "pLa"+val, postId)
+	}
+	Buil.Del(3, "paL"+postId)
+
+	// TODO 移除跟帖的相关属性
+	var threads []model.Thread
+	p.DB.Where("post_id = ?", postId).Find(&threads)
+
+	for _, thread := range threads {
+		// TODO 移除收藏
+		for _, val := range Buil.MembersS(3, "taF"+thread.ID.String()) {
+			Buil.RemS(3, "tFa"+val, thread.ID.String())
+		}
+		Buil.Del(3, "taF"+thread.ID.String())
+
+		// TODO 移除点赞
+		Buil.Del(3, "tiL"+thread.ID.String())
 	}
 
 	// TODO 删除帖子
@@ -187,20 +205,12 @@ func (p PostController) PageList(ctx *gin.Context) {
 	var posts []model.Post
 	p.DB.Order("created_at desc").Offset((pageNum - 1) * pageSize).Limit(pageSize).Find(&posts)
 
-	// TODO 查询与之对应的用户列表
-	users := make([]dto.UserDto, len(posts))
-	for i, post := range posts {
-		var user model.User
-		p.DB.Where("id = ?", post.UserId).First(&user)
-		users[i] = dto.ToUserDto(user)
-	}
-
 	// TODO 记录的总条数
 	var total int
 	p.DB.Model(model.Post{}).Count(&total)
 
 	// TODO 返回数据
-	response.Success(ctx, gin.H{"posts": posts, "users": users, "total": total}, "成功")
+	response.Success(ctx, gin.H{"posts": posts, "total": total}, "成功")
 }
 
 // @title    NewPostController

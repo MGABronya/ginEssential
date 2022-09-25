@@ -5,10 +5,10 @@
 package controller
 
 import (
-	"Essential/common"
-	"Essential/model"
-	"Essential/response"
-	"Essential/util"
+	"ginEssential/common"
+	"ginEssential/model"
+	"ginEssential/response"
+	"ginEssential/util"
 	"log"
 	"path"
 	"strconv"

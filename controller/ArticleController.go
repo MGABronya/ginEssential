@@ -6,11 +6,10 @@ package controller
 
 import (
 	Buil "Blog/util"
-	"Essential/common"
-	"Essential/dto"
-	"Essential/model"
-	"Essential/response"
-	"Essential/vo"
+	"ginEssential/common"
+	"ginEssential/model"
+	"ginEssential/response"
+	"ginEssential/vo"
 	"log"
 	"strconv"
 
@@ -117,7 +116,6 @@ func (a ArticleController) Update(ctx *gin.Context) {
 func (a ArticleController) Show(ctx *gin.Context) {
 	// TODO 获取path中的id
 	articleId := ctx.Params.ByName("id")
-	user, _ := ctx.Get("user")
 	var article model.Article
 
 	// TODO 查看文章是否在数据库中存在
@@ -126,7 +124,7 @@ func (a ArticleController) Show(ctx *gin.Context) {
 		return
 	}
 
-	response.Success(ctx, gin.H{"article": article, "user": dto.ToUserDto(user.(model.User))}, "成功")
+	response.Success(ctx, gin.H{"article": article}, "成功")
 }
 
 // @title    Delete
@@ -152,14 +150,29 @@ func (a ArticleController) Delete(ctx *gin.Context) {
 	userId := user.(model.User).ID
 
 	// TODO 查看用户是否有操作文章的权力
-	if Buil.GetH("permission", strconv.Itoa(int(userId)))[0] < '4' && userId != article.UserId {
+	if Buil.GetH(0, "permission", strconv.Itoa(int(userId)))[0] < '4' && userId != article.UserId {
 		response.Fail(ctx, nil, "文章不属于您，请勿非法操作")
 		return
 	}
 
 	a.DB.Delete(&article)
 
-	response.Success(ctx, gin.H{"article": article}, "成功")
+	// TODO 移除收藏
+	for _, val := range Buil.MembersS(1, "aF"+articleId) {
+		Buil.RemS(1, "Fa"+val, articleId)
+	}
+	Buil.Del(1, "aF"+articleId)
+
+	// TODO 移除点赞
+	Buil.Del(1, "iL"+articleId)
+
+	// TODO 移除标签
+	for _, val := range Buil.MembersS(1, "aL"+articleId) {
+		Buil.RemS(1, "La"+val, articleId)
+	}
+	Buil.Del(1, "aL"+articleId)
+
+	response.Success(ctx, gin.H{"article": article}, "删除成功")
 }
 
 // @title    PageList
@@ -176,20 +189,12 @@ func (a ArticleController) PageList(ctx *gin.Context) {
 	var articles []model.Article
 	a.DB.Order("created_at desc").Offset((pageNum - 1) * pageSize).Limit(pageSize).Find(&articles)
 
-	// TODO 查询与之对应的用户列表
-	users := make([]dto.UserDto, len(articles))
-	for i, article := range articles {
-		var user model.User
-		a.DB.Where("id = ?", article.UserId).First(&user)
-		users[i] = dto.ToUserDto(user)
-	}
-
 	// TODO 记录的总条数
 	var total int
 	a.DB.Model(model.Article{}).Count(&total)
 
 	// TODO 返回数据
-	response.Success(ctx, gin.H{"articles": articles, "users": users, "total": total}, "成功")
+	response.Success(ctx, gin.H{"articles": articles, "total": total}, "成功")
 }
 
 // @title    NewArticleController
