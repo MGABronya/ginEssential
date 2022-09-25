@@ -5,7 +5,7 @@
 package common
 
 import (
-	"Essential/model"
+	"ginEssential/model"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"

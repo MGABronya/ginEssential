@@ -9,25 +9,24 @@ import (
 	"github.com/spf13/viper"
 )
 
-var Client *redis.Client
+var Client [16]*redis.Client
 
 // @title    InitRedis
 // @description   从配置文件中读取数据库相关信息后，完成数据库初始化
 // @auth      MGAronya（张健）             2022-9-16 10:07
-// @param     void        void         没有入参
+// @param     val int         表示初始化第几号redis库
 // @return    *redis.Client         将返回一个初始化后的redis数据库指针
-func InitRedis() *redis.Client {
+func InitRedis(val int) *redis.Client {
 	addr := viper.GetString("datasource.addredis")
-	dbid := viper.GetInt("datasource.redisid")
 	password := viper.GetString("datasource.redispass")
 	host := viper.GetString("datasource.host")
 
 	client := redis.NewClient(&redis.Options{
 		Addr:     host + ":" + addr,
 		Password: password,
-		DB:       dbid,
+		DB:       val,
 	})
-	Client = client
+	Client[val] = client
 	return client
 }
 
@@ -36,6 +35,6 @@ func InitRedis() *redis.Client {
 // @auth      MGAronya（张健）             2022-9-16 10:08
 // @param     void        void         没有入参
 // @return    *redis.Client         将返回一个初始化后的数据库指针
-func GetRedisClient() *redis.Client {
-	return Client
+func GetRedisClient(val int) *redis.Client {
+	return Client[val]
 }

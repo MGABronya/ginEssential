@@ -5,8 +5,8 @@
 package common
 
 import (
-	"Essential/model"
 	"fmt"
+	"ginEssential/model"
 	"net/url"
 
 	"github.com/jinzhu/gorm"
