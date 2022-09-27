@@ -84,7 +84,7 @@ func Register(ctx *gin.Context) {
 	}
 	DB.Create(&newUser)
 	// TODO 设置用户权限
-	Buil.SetH(0, "permission", strconv.Itoa(int(newUser.ID)), "2")
+	Buil.SetH(0, "permission", strconv.Itoa(int(newUser.ID)), "1")
 	// TODO 发放token给前端
 	token, err := common.ReleaseToken(newUser)
 	if err != nil {

@@ -60,7 +60,7 @@ func (a ArticleController) Create(ctx *gin.Context) {
 	}
 
 	// TODO 成功
-	response.Success(ctx, nil, "创建成功")
+	response.Success(ctx, gin.H{"article": article}, "创建成功")
 }
 
 // @title    Update
@@ -169,6 +169,9 @@ func (a ArticleController) Delete(ctx *gin.Context) {
 	// TODO 移除标签
 	for _, val := range Buil.MembersS(1, "aL"+articleId) {
 		Buil.RemS(1, "La"+val, articleId)
+		if Buil.CardS(1, "La"+val) == 0 {
+			Buil.Del(1, "La"+val)
+		}
 	}
 	Buil.Del(1, "aL"+articleId)
 

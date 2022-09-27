@@ -26,7 +26,7 @@
 
     **功能：用于用户找回密码**
 
-    **方法类型：POST**
+    **方法类型：PUT**
 
     请求参数：Body部分，form-data类型，接收两个字符串分别为Email，Verify。其中Verify必须与邮箱验证码相同。
 
@@ -36,7 +36,7 @@
 
     **功能：用于用户修改密码**
 
-    **方法类型：POST**
+    **方法类型：PUT**
 
     请求参数：Body部分，form-data类型，接收两个字符串分别为first，second。其中first为旧密码，second为新密码。
 
@@ -202,7 +202,7 @@
 
     请求参数：Authorization中的Bearer Token中提供注册、登录时给出的token。在Body，raw格式给出json类型数据包含title、content、res_long(可选)、res_short（可选），其中title表示文章标题，content表示文章内容，res_long表示长文本备用键值，res_short表示短文本备用键值。
 
-    返回值：成功时返回创建成功相关信息，否则给出失败原因
+    返回值：成功时返回创建成功相关信息和文章信息article，否则给出失败原因
 
   - **接口地址：/article/:id**
 
@@ -238,7 +238,7 @@
 
     **功能：给出文章列表**
 
-    **方法类型：POST**
+    **方法类型：GET**
 
     请求参数：uthorization中的Bearer Token中提供注册、登录时给出的token。在Params处提供pageNum（表示第几页，默认值为1）和pageSize（表示一页多少篇文章，默认值为20）。
 
@@ -254,7 +254,7 @@
 
     请求参数：uthorization中的Bearer Token中提供注册、登录时给出的token。在Body，raw格式给出json类型数据包含title、content、res_long(可选)、res_short（可选），其中title表示帖子标题，content表示帖子内容，res_long表示长文本备用键值，res_short表示短文本备用键值。
 
-    返回值：创建成功时返回成功信息，失败时返回失败原因
+    返回值：创建成功时返回成功信息和帖子信息post，失败时返回失败原因
 
   - **接口地址：/post/:id**
 
@@ -290,7 +290,7 @@
 
     **功能：提供帖子列表**
 
-    **方法类型：POST**
+    **方法类型：GET**
 
     请求参数：uthorization中的Bearer Token中提供注册、登录时给出的token。在Params处提供pageNum（表示第几页，默认值为1）和pageSize（表示一页多少篇帖子，默认值为20）。
 
@@ -347,3 +347,4 @@
     请求参数：uthorization中的Bearer Token中提供注册、登录时给出的token。在Params处提供pageNum（表示第几页，默认值为1）和pageSize（表示一页多少篇跟帖，默认值为20）,在接口id处给出帖子的id。
 
     返回值：成功时，以json格式返回两个数组threads，threads返回了相应列表的跟帖信息（按照创建时间排序，越早创建排序越前）
+

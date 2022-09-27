@@ -60,7 +60,7 @@ func (p PostController) Create(ctx *gin.Context) {
 	}
 
 	// TODO 成功
-	response.Success(ctx, nil, "创建成功")
+	response.Success(ctx, gin.H{"post": post}, "创建成功")
 }
 
 // @title    Update
@@ -166,6 +166,9 @@ func (p PostController) Delete(ctx *gin.Context) {
 	// TODO 移除标签
 	for _, val := range Buil.MembersS(3, "paL"+postId) {
 		Buil.RemS(3, "pLa"+val, postId)
+		if Buil.CardS(3, "pLa"+val) == 0 {
+			Buil.Del(3, "pLa"+val)
+		}
 	}
 	Buil.Del(3, "paL"+postId)
 

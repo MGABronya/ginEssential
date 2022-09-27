@@ -27,10 +27,10 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 	r.GET("/verify/:id", controller.VerifyEmail)
 
 	// TODO 用户找回密码
-	r.POST("/security", controller.Security)
+	r.PUT("/security", controller.Security)
 
 	// TODO 用户更改密码
-	r.POST("/updatepass", middleware.AuthMiddleware(), controller.UpdatePass)
+	r.PUT("/updatepass", middleware.AuthMiddleware(), controller.UpdatePass)
 
 	// TODO 用户的登录路由
 	r.POST("/login", controller.Login)
@@ -51,7 +51,7 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 	r.PUT("/personal", middleware.AuthMiddleware(), controller.PersonalUpdate)
 
 	// TODO 用户的头像更新路由
-	r.POST("/personal", middleware.AuthMiddleware(), controller.PersonalIcon)
+	r.PUT("/personal", middleware.AuthMiddleware(), controller.PersonalIcon)
 
 	// TODO 个人信息展示路由
 	r.GET("/personal/:id", middleware.AuthMiddleware(), controller.PersonalShow)
@@ -90,7 +90,7 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 	articleRoutes.DELETE("/:id", articleController.Delete)
 
 	// TODO 文章的列表路由
-	articleRoutes.POST("/pagelist", articleController.PageList)
+	articleRoutes.GET("/pagelist", articleController.PageList)
 
 	// TODO 帖子的路由分组
 	postRoutes := r.Group("/post")
@@ -102,7 +102,7 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 	postController := controller.NewPostController()
 
 	// TODO 帖子的创建路由
-	postRoutes.POST("/:id", postController.Create)
+	postRoutes.POST("", postController.Create)
 
 	// TODO 帖子的更新路由
 	postRoutes.PUT("/:id", postController.Update)
@@ -114,7 +114,7 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 	postRoutes.DELETE("/:id", postController.Delete)
 
 	//TODO 帖子的列表路由
-	postRoutes.POST("/pagelist", postController.PageList)
+	postRoutes.GET("/pagelist", postController.PageList)
 
 	// TODO 跟帖的路由分组
 	threadRoutes := r.Group("/thread")
@@ -126,7 +126,7 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 	threadController := controller.NewThreadController()
 
 	// TODO 跟帖的创建路由
-	threadRoutes.POST("", threadController.Create)
+	threadRoutes.POST("/:id", threadController.Create)
 
 	// TODO 跟帖的更新路由
 	threadRoutes.PUT("/:id", threadController.Update)
