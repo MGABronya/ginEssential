@@ -64,7 +64,7 @@ func (b BackGroundController) Create(ctx *gin.Context) {
 	file.Filename = strconv.Itoa(int(user.ID)) + extName
 
 	// TODO 将文件存入本地
-	ctx.SaveUploadedFile(file, "./BackGroundController/"+file.Filename)
+	ctx.SaveUploadedFile(file, "./BackGround/"+file.Filename)
 
 	b.DB.Where("id = ?", user.ID).Take(&user)
 
