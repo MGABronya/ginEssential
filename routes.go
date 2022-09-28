@@ -51,7 +51,7 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 	r.PUT("/personal", middleware.AuthMiddleware(), controller.PersonalUpdate)
 
 	// TODO 用户的头像更新路由
-	r.PUT("/personal", middleware.AuthMiddleware(), controller.PersonalIcon)
+	r.PUT("/personalIcon", middleware.AuthMiddleware(), controller.PersonalIcon)
 
 	// TODO 个人信息展示路由
 	r.GET("/personal/:id", middleware.AuthMiddleware(), controller.PersonalShow)
@@ -152,11 +152,11 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 	// TODO 查看用户使用的背景图片
 	backgroundRoutes.GET("/show", backgroundController.Show)
 
-	// TODO 查看用户选择新的背景图片
-	backgroundRoutes.GET("/update/:id", backgroundController.Update)
+	// TODO 用户选择新的背景图片
+	backgroundRoutes.PUT("/update/:id", backgroundController.Update)
 
 	// TODO 用户上传自己的用户图片
-	backgroundRoutes.POST("/create", backgroundController.Create)
+	backgroundRoutes.PUT("/create", backgroundController.Create)
 
 	return r
 }
