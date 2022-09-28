@@ -15,8 +15,8 @@ type Thread struct {
 	UserId    uint      `json:"user_id" gorm:"not null"`             // 作者的id
 	PostId    string    `json:"post_id" gorm:"type:char(36)"`        // 主贴的id
 	Content   string    `json:"content" gorm:"type:text;not null"`   // 内容
-	ResLong   string    `json:"res_long" gorm:"type:text;not null"`  // 备用长文本
-	ResShort  string    `json:"res_short" gorm:"type:text;not null"` // 备用短文本
+	ResLong   string    `json:"res_long" gorm:"type:text;"`          // 备用长文本
+	ResShort  string    `json:"res_short" gorm:"type:text;"`         // 备用短文本
 	CreatedAt Time      `json:"created_at" gorm:"type:timestamp"`    // 创建时间
 	UpdatedAt Time      `json:"updated_at" gorm:"type:timestamp"`    // 更新时间
 }

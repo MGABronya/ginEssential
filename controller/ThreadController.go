@@ -124,7 +124,7 @@ func (t ThreadController) Show(ctx *gin.Context) {
 	threadId := ctx.Params.ByName("id")
 
 	var thread model.Thread
-	// TODO 查看帖子是否存在
+	// TODO 查看跟帖是否存在
 	if t.DB.Where("id = ?", threadId).First(&thread).RecordNotFound() {
 		response.Fail(ctx, nil, "跟帖不存在")
 		return
@@ -184,7 +184,26 @@ func (t ThreadController) PageList(ctx *gin.Context) {
 	pageNum, _ := strconv.Atoi(ctx.DefaultQuery("pageNum", "1"))
 	pageSize, _ := strconv.Atoi(ctx.DefaultQuery("pageSize", "20"))
 
+	// TODO 获取path中的id
 	postId := ctx.Params.ByName("id")
+
+	var post model.Post
+
+	// TODO 查看帖子是否存在
+	if t.DB.Where("id = ?", postId).First(&post).RecordNotFound() {
+		response.Fail(ctx, nil, "帖子不存在")
+		return
+	}
+
+	// TODO 获取登录用户
+	tuser, _ := ctx.Get("user")
+	user := tuser.(model.User)
+
+	// TODO 查看是否有权限
+	if post.UserId != user.ID && (post.Visible == 3 || (post.Visible == 2 && !Buil.IsS(4, "Fr"+strconv.Itoa(int(user.ID)), strconv.Itoa(int(post.UserId))))) {
+		response.Fail(ctx, nil, "权限不足，不能查看")
+		return
+	}
 
 	// TODO 分页
 	var threads []model.Thread
@@ -192,7 +211,7 @@ func (t ThreadController) PageList(ctx *gin.Context) {
 
 	// TODO 记录的总条数
 	var total int
-	t.DB.Model(model.Post{}).Count(&total)
+	t.DB.Model(model.Thread{}).Count(&total)
 
 	// TODO 返回数据
 	response.Success(ctx, gin.H{"threads": threads, "total": total}, "成功")

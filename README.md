@@ -70,7 +70,7 @@
 
     请求参数：Authorization中的Bearer Token中提供注册、登录时给出的token。
 
-    返回值：返回中包含一个articles数组，其中包含了该用户所有文章的信息。
+    返回值：返回中包含一个articles数组，其中包含了该用户所有文章的信息。在Params处提供pageNum（表示第几页，默认值为1）和pageSize（表示一页多少篇文章，默认值为20）。
 
   - **接口地址：/personalposts**
 
@@ -78,7 +78,7 @@
 
     **方法类型：GET**
 
-    请求参数：Authorization中的Bearer Token中提供注册、登录时给出的token。
+    请求参数：Authorization中的Bearer Token中提供注册、登录时给出的token。在Params处提供pageNum（表示第几页，默认值为1）和pageSize（表示一页多少篇帖子，默认值为20）。
 
     返回值：返回中包含一个posts数组，其中包含了该用户所有帖子的信息。
 
@@ -88,7 +88,7 @@
 
     **方法：GET**
 
-    请求参数：Authorization中的Bearer Token中提供注册、登录时给出的token。
+    请求参数：Authorization中的Bearer Token中提供注册、登录时给出的token。在Params处提供pageNum（表示第几页，默认值为1）和pageSize（表示一页多少篇跟帖，默认值为20）。
 
     返回值：返回中包含一个threads数组，其中包含了该用户所有跟帖的信息。
 
@@ -112,11 +112,11 @@
 
     返回值：更新成功后返回用户更新后的个人信息，否则返回错误原因。
 
-  - **接口地址：/personal**
+  - **接口地址：/personalicon**
 
     **功能：修改个人头像**
 
-    **方法类型：POST**
+    **方法类型：PUT**
 
     请求参数：.Header中需要包含Content-Type，指名为multipart/form-data。在Body中给用form-data格式给出file（文件类型）。uthorization中的Bearer Token中提供注册、登录时给出的token。
 
@@ -136,7 +136,7 @@
 
     **功能：用户选择其它的默认背景**
 
-    **方法类型：GET**
+    **方法类型：PUT**
 
     请求参数：用户的token以及用户选择的背景的文件名（即接口地址id部分）
 
@@ -146,7 +146,7 @@
 
     **功能：用户上传自定义的背景**
 
-    **方法类型：POST**
+    **方法类型：PUT**
 
     请求参数：.Header中需要包含Content-Type，指名为multipart/form-data。uthorization中的Bearer Token中提供注册、登录时给出的token，同时在Body部分，form-data格式，接收file（文件类型）
 
@@ -168,7 +168,7 @@
 
     **方法：GET**
 
-    请求参数：指定用户的用户id（即接口地址id部分）
+    请求参数：Authorization中的Bearer Token中提供注册、登录时给出的token。指定用户的用户id（即接口地址id部分），在Params处提供pageNum（表示第几页，默认值为1）和pageSize（表示一页多少篇帖子，默认值为20）。
 
     返回值：返回一个articles表示指定用户的文章列表
 
@@ -178,7 +178,7 @@
 
     **方法：GET**
 
-    请求参数：指定用户的用户id（即接口地址id部分）
+    请求参数：Authorization中的Bearer Token中提供注册、登录时给出的token。指定用户的用户id（即接口地址id部分），在Params处提供pageNum（表示第几页，默认值为1）和pageSize（表示一页多少篇帖子，默认值为20）。
 
     返回值：返回一个posts表示指定用户的帖子列表
 
@@ -188,7 +188,7 @@
 
     **方法：GET**
 
-    请求参数：指定用户的用户id（即接口地址id部分）
+    请求参数：Authorization中的Bearer Token中提供注册、登录时给出的token。指定用户的用户id（即接口地址id部分），在Params处提供pageNum（表示第几页，默认值为1）和pageSize（表示一页多少篇帖子，默认值为20）。
 
     返回值：返回一个posts表示指定用户的跟帖列表
 

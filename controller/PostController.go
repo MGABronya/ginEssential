@@ -114,10 +114,19 @@ func (p PostController) Show(ctx *gin.Context) {
 	// TODO 获取path中的id
 	postId := ctx.Params.ByName("id")
 
+	tuser, _ := ctx.Get("user")
+	user := tuser.(model.User)
+
 	var post model.Post
 	// TODO 查看帖子是否存在
 	if p.DB.Where("id = ?", postId).First(&post).RecordNotFound() {
 		response.Fail(ctx, nil, "帖子不存在")
+		return
+	}
+
+	// TODO 查看是否有权限
+	if post.UserId != user.ID && (post.Visible == 3 || (post.Visible == 2 && !Buil.IsS(4, "Fr"+strconv.Itoa(int(user.ID)), strconv.Itoa(int(post.UserId))))) {
+		response.Fail(ctx, nil, "权限不足，不能查看")
 		return
 	}
 
@@ -187,6 +196,8 @@ func (p PostController) Delete(ctx *gin.Context) {
 		Buil.Del(3, "tiL"+thread.ID.String())
 	}
 
+	Buil.DelH(3, "W", post.ID.String)
+
 	// TODO 删除帖子
 	p.DB.Where(model.Thread{PostId: post.ID.String()}).Delete(model.Thread{})
 	p.DB.Delete(&post)
@@ -206,11 +217,12 @@ func (p PostController) PageList(ctx *gin.Context) {
 
 	// TODO 分页
 	var posts []model.Post
-	p.DB.Order("created_at desc").Offset((pageNum - 1) * pageSize).Limit(pageSize).Find(&posts)
 
-	// TODO 记录的总条数
+	// TODO 查找所有分页中可见的条目
+	p.DB.Where("visible = 1").Order("created_at desc").Offset((pageNum - 1) * pageSize).Limit(pageSize).Find(&posts)
+
 	var total int
-	p.DB.Model(model.Post{}).Count(&total)
+	p.DB.Where("visible = 1").Model(model.Post{}).Count(&total)
 
 	// TODO 返回数据
 	response.Success(ctx, gin.H{"posts": posts, "total": total}, "成功")

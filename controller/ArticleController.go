@@ -118,9 +118,18 @@ func (a ArticleController) Show(ctx *gin.Context) {
 	articleId := ctx.Params.ByName("id")
 	var article model.Article
 
+	tuser, _ := ctx.Get("user")
+	user := tuser.(model.User)
+
 	// TODO 查看文章是否在数据库中存在
 	if a.DB.Where("id = ?", articleId).First(&article).RecordNotFound() {
 		response.Fail(ctx, nil, "文章不存在")
+		return
+	}
+
+	// TODO 查看是否有权限
+	if article.UserId != user.ID && (article.Visible == 3 || (article.Visible == 2 && !Buil.IsS(4, "Fr"+strconv.Itoa(int(user.ID)), strconv.Itoa(int(article.UserId))))) {
+		response.Fail(ctx, nil, "权限不足，不能查看")
 		return
 	}
 
@@ -190,11 +199,12 @@ func (a ArticleController) PageList(ctx *gin.Context) {
 
 	// TODO 分页
 	var articles []model.Article
-	a.DB.Order("created_at desc").Offset((pageNum - 1) * pageSize).Limit(pageSize).Find(&articles)
 
-	// TODO 记录的总条数
+	// TODO 查找所有分页中可见的条目
+	a.DB.Where("visible = 1").Order("created_at desc").Offset((pageNum - 1) * pageSize).Limit(pageSize).Find(&articles)
+
 	var total int
-	a.DB.Model(model.Article{}).Count(&total)
+	a.DB.Where("visible = 1").Model(model.Article{}).Count(&total)
 
 	// TODO 返回数据
 	response.Success(ctx, gin.H{"articles": articles, "total": total}, "成功")

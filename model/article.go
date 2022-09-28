@@ -15,8 +15,9 @@ type Article struct {
 	UserId    uint      `json:"user_id" gorm:"not null"`                // 文章的作者id
 	Title     string    `json:"title" gorm:"type:varchar(50);not null"` // 文章的标题
 	Content   string    `json:"content" gorm:"type:text;not null"`      // 文章的内容
-	ResLong   string    `json:"res_long" gorm:"type:text;not null"`     // 备用长文本
-	ResShort  string    `json:"res_short" gorm:"type:text;not null"`    // 备用短文本
+	ResLong   string    `json:"res_long" gorm:"type:text;"`             // 备用长文本
+	ResShort  string    `json:"res_short" gorm:"type:text;"`            // 备用短文本
+	Visible   int8      `json:"visible" gorm:"type:tinyint;default:1"`  // 可见等级
 	CreatedAt Time      `json:"created_at" gorm:"type:timestamp"`       // 文章的创建日期
 	UpdatedAt Time      `json:"updated_at" gorm:"type:timestamp"`       // 文章的更新日期
 }
@@ -26,6 +27,6 @@ type Article struct {
 // @auth      MGAronya（张健）             2022-9-16 10:19
 // @param     scope *gorm.Scope
 // @return    error
-func (post *Article) BeforeCreate(scope *gorm.Scope) error {
+func (article *Article) BeforeCreate(scope *gorm.Scope) error {
 	return scope.SetColumn("ID", uuid.NewV4())
 }
