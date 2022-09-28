@@ -5,6 +5,7 @@
 package controller
 
 import (
+	Buil "Blog/util"
 	"fmt"
 	"ginEssential/common"
 	"ginEssential/dto"
@@ -40,17 +41,25 @@ func PersonalPage(ctx *gin.Context) {
 // @param    ctx *gin.Context       接收一个上下文
 // @return   void
 func PersonalPageArticles(ctx *gin.Context) {
+	// TODO 获取登录用户
 	tuser, _ := ctx.Get("user")
+	user := tuser.(model.User)
 	db := common.GetDB()
 
-	user := tuser.(model.User)
+	// TODO 获取分页参数
+	pageNum, _ := strconv.Atoi(ctx.DefaultQuery("pageNum", "1"))
+	pageSize, _ := strconv.Atoi(ctx.DefaultQuery("pageSize", "20"))
 
+	// TODO 分页
 	var articles []model.Article
+	db.Where("user_id = ?", user.ID).Order("created_at desc").Offset((pageNum - 1) * pageSize).Limit(pageSize).Find(&articles)
 
-	// TODO 查看用户的所有文章
-	db.Order("created_at desc").Where("user_id = ?", user.ID).Find(&articles)
+	// TODO 记录的总条数
+	var total int
+	db.Where("user_id = ?", user.ID).Model(model.Article{}).Count(&total)
 
-	ctx.JSON(http.StatusOK, gin.H{"code": 200, "data": gin.H{"articles": articles}})
+	// TODO 返回数据
+	response.Success(ctx, gin.H{"articles": articles, "total": total}, "成功")
 }
 
 // @title    PersonalPagePosts
@@ -59,17 +68,25 @@ func PersonalPageArticles(ctx *gin.Context) {
 // @param    ctx *gin.Context       接收一个上下文
 // @return   void
 func PersonalPagePosts(ctx *gin.Context) {
+	// TODO 获取登录用户
 	tuser, _ := ctx.Get("user")
+	user := tuser.(model.User)
 	db := common.GetDB()
 
-	user := tuser.(model.User)
+	// TODO 获取分页参数
+	pageNum, _ := strconv.Atoi(ctx.DefaultQuery("pageNum", "1"))
+	pageSize, _ := strconv.Atoi(ctx.DefaultQuery("pageSize", "20"))
 
+	// TODO 分页
 	var posts []model.Post
+	db.Where("user_id = ?", user.ID).Order("created_at desc").Offset((pageNum - 1) * pageSize).Limit(pageSize).Find(&posts)
 
-	// TODO 查看用户的所有帖子
-	db.Order("created_at desc").Where("user_id = ?", user.ID).Find(&posts)
+	// TODO 记录的总条数
+	var total int
+	db.Where("user_id = ?", user.ID).Model(model.Post{}).Count(&total)
 
-	ctx.JSON(http.StatusOK, gin.H{"code": 200, "data": gin.H{"posts": posts}})
+	// TODO 返回数据
+	response.Success(ctx, gin.H{"posts": posts, "total": total}, "成功")
 }
 
 // @title    PersonalPageThreads
@@ -78,17 +95,25 @@ func PersonalPagePosts(ctx *gin.Context) {
 // @param    ctx *gin.Context       接收一个上下文
 // @return   void
 func PersonalPageThreads(ctx *gin.Context) {
+	// TODO 获取登录用户
 	tuser, _ := ctx.Get("user")
+	user := tuser.(model.User)
 	db := common.GetDB()
 
-	user := tuser.(model.User)
+	// TODO 获取分页参数
+	pageNum, _ := strconv.Atoi(ctx.DefaultQuery("pageNum", "1"))
+	pageSize, _ := strconv.Atoi(ctx.DefaultQuery("pageSize", "20"))
 
+	// TODO 分页
 	var threads []model.Thread
+	db.Where("user_id = ?", user.ID).Order("created_at desc").Offset((pageNum - 1) * pageSize).Limit(pageSize).Find(&threads)
 
-	// TODO 查看用户的所有跟帖
-	db.Order("created_at desc").Where("user_id = ?", user.ID).Find(&threads)
+	// TODO 记录的总条数
+	var total int
+	db.Where("user_id = ?", user.ID).Model(model.Thread{}).Count(&total)
 
-	ctx.JSON(http.StatusOK, gin.H{"code": 200, "data": gin.H{"threads": threads}})
+	// TODO 返回数据
+	response.Success(ctx, gin.H{"threads": threads, "total": total}, "成功")
 }
 
 // @title    PersonalUpdate
@@ -229,19 +254,41 @@ func PersonalShow(ctx *gin.Context) {
 // @return   void
 func PersonalShowArticles(ctx *gin.Context) {
 	db := common.GetDB()
-	var user model.User
+	// TODO 获取登录用户
+	tuser, _ := ctx.Get("user")
+	user := tuser.(model.User)
+	// TODO 获取分页参数
+	pageNum, _ := strconv.Atoi(ctx.DefaultQuery("pageNum", "1"))
+	pageSize, _ := strconv.Atoi(ctx.DefaultQuery("pageSize", "20"))
+
+	userId := ctx.Params.ByName("id")
 
 	// TODO 查看用户是否存在
-	if db.Where("id = ?", ctx.Params.ByName("id")).First(&user).RecordNotFound() {
+	if db.Where("id = ?", ctx.Params.ByName("id")).First(&model.User{}).RecordNotFound() {
 		response.Fail(ctx, nil, "用户不存在")
 		return
 	}
 
-	// TODO 查询用户的文章
+	// TODO 分页
 	var articles []model.Article
-	db.Order("created_at desc").Where("user_id = ?", user.ID).Find(&articles)
+	var level int8
+	if strconv.Itoa(int(user.ID)) == userId {
+		level = 4
+	} else if Buil.IsS(4, "Fr"+strconv.Itoa(int(user.ID)), userId) {
+		level = 3
+	} else {
+		level = 2
+	}
 
-	ctx.JSON(http.StatusOK, gin.H{"code": 200, "data": gin.H{"articles": articles}})
+	// TODO 查找所有分页中可见的条目
+	db.Where("user_id = ? and visible < ?", user.ID, level).Order("created_at desc").Offset((pageNum - 1) * pageSize).Limit(pageSize).Find(&articles)
+
+	// TODO 记录的总条数
+	var total int
+	db.Where("user_id = ? and visible < ?", user.ID, level).Model(model.Article{}).Count(&total)
+
+	// TODO 返回数据
+	response.Success(ctx, gin.H{"articles": articles, "total": total}, "成功")
 }
 
 // @title    PersonalShowPosts
@@ -251,18 +298,41 @@ func PersonalShowArticles(ctx *gin.Context) {
 // @return   void
 func PersonalShowPosts(ctx *gin.Context) {
 	db := common.GetDB()
-	var user model.User
+	// TODO 获取登录用户
+	tuser, _ := ctx.Get("user")
+	user := tuser.(model.User)
+	// TODO 获取分页参数
+	pageNum, _ := strconv.Atoi(ctx.DefaultQuery("pageNum", "1"))
+	pageSize, _ := strconv.Atoi(ctx.DefaultQuery("pageSize", "20"))
+
+	userId := ctx.Params.ByName("id")
 
 	// TODO 查看用户是否存在
-	if db.Where("id = ?", ctx.Params.ByName("id")).First(&user).RecordNotFound() {
+	if db.Where("id = ?", ctx.Params.ByName("id")).First(&model.User{}).RecordNotFound() {
 		response.Fail(ctx, nil, "用户不存在")
 		return
 	}
 
+	// TODO 分页
 	var posts []model.Post
-	db.Order("created_at desc").Where("user_id = ?", user.ID).Find(&posts)
+	var level int8
+	if strconv.Itoa(int(user.ID)) == userId {
+		level = 4
+	} else if Buil.IsS(4, "Fr"+strconv.Itoa(int(user.ID)), userId) {
+		level = 3
+	} else {
+		level = 2
+	}
 
-	ctx.JSON(http.StatusOK, gin.H{"code": 200, "data": gin.H{"posts": posts}})
+	// TODO 查找所有分页中可见的条目
+	db.Where("user_id = ? and visible < ?", user.ID, level).Order("created_at desc").Offset((pageNum - 1) * pageSize).Limit(pageSize).Find(&posts)
+
+	// TODO 记录的总条数
+	var total int
+	db.Where("user_id = ? and visible < ?", user.ID, level).Model(model.Post{}).Count(&total)
+
+	// TODO 返回数据
+	response.Success(ctx, gin.H{"posts": posts, "total": total}, "成功")
 }
 
 // @title    PersonalShowThreads
@@ -272,18 +342,41 @@ func PersonalShowPosts(ctx *gin.Context) {
 // @return   void
 func PersonalShowThreads(ctx *gin.Context) {
 	db := common.GetDB()
-	var user model.User
+	// TODO 获取登录用户
+	tuser, _ := ctx.Get("user")
+	user := tuser.(model.User)
+	// TODO 获取分页参数
+	pageNum, _ := strconv.Atoi(ctx.DefaultQuery("pageNum", "1"))
+	pageSize, _ := strconv.Atoi(ctx.DefaultQuery("pageSize", "20"))
+
+	userId := ctx.Params.ByName("id")
 
 	// TODO 查看用户是否存在
-	if db.Where("id = ?", ctx.Params.ByName("id")).First(&user).RecordNotFound() {
+	if db.Where("id = ?", ctx.Params.ByName("id")).First(&model.User{}).RecordNotFound() {
 		response.Fail(ctx, nil, "用户不存在")
 		return
 	}
 
+	// TODO 分页
 	var threads []model.Thread
-	db.Order("created_at desc").Where("user_id = ?", user.ID).Find(&threads)
+	var level int8
+	if strconv.Itoa(int(user.ID)) == userId {
+		level = 4
+	} else if Buil.IsS(4, "Fr"+strconv.Itoa(int(user.ID)), userId) {
+		level = 3
+	} else {
+		level = 2
+	}
 
-	ctx.JSON(http.StatusOK, gin.H{"code": 200, "data": gin.H{"threads": threads}})
+	// TODO 查找所有分页中可见的条目
+	db.Table("threads").Joins("join posts on threads.post_id = posts.id").Where("posts.user_id = ? and posts.visible < ?", user.ID, level).Order("created_at desc").Offset((pageNum - 1) * pageSize).Limit(pageSize).Find(&threads)
+
+	// TODO 记录的总条数
+	var total int
+	db.Table("threads").Joins("join posts on threads.post_id = posts.id").Where("posts.user_id = ? and posts.visible < ?", user.ID, level).Model(model.Thread{}).Count(&total)
+
+	// TODO 返回数据
+	response.Success(ctx, gin.H{"threads": threads, "total": total}, "成功")
 }
 
 // @title    PersonalShowUsers
