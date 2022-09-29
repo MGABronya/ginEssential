@@ -52,6 +52,7 @@ func (p PostController) Create(ctx *gin.Context) {
 		Content:  requestPost.Content,
 		ResLong:  requestPost.ResLong,
 		ResShort: requestPost.ResShort,
+		Visible: 1,
 	}
 
 	// TODO 插入数据
@@ -196,7 +197,7 @@ func (p PostController) Delete(ctx *gin.Context) {
 		Buil.Del(3, "tiL"+thread.ID.String())
 	}
 
-	Buil.DelH(3, "W", post.ID.String)
+	Buil.DelH(3, "W", post.ID.String())
 
 	// TODO 删除帖子
 	p.DB.Where(model.Thread{PostId: post.ID.String()}).Delete(model.Thread{})
@@ -211,6 +212,11 @@ func (p PostController) Delete(ctx *gin.Context) {
 // @param    ctx *gin.Context       接收一个上下文
 // @return   void
 func (p PostController) PageList(ctx *gin.Context) {
+	tuser, _ := ctx.Get("user")
+	usera := tuser.(model.User)
+
+	users := Buil.MembersS(4, "Fr"+strconv.Itoa(int(usera.ID)))
+
 	// TODO 获取分页参数
 	pageNum, _ := strconv.Atoi(ctx.DefaultQuery("pageNum", "1"))
 	pageSize, _ := strconv.Atoi(ctx.DefaultQuery("pageSize", "20"))
@@ -219,10 +225,10 @@ func (p PostController) PageList(ctx *gin.Context) {
 	var posts []model.Post
 
 	// TODO 查找所有分页中可见的条目
-	p.DB.Where("visible = 1").Order("created_at desc").Offset((pageNum - 1) * pageSize).Limit(pageSize).Find(&posts)
+	p.DB.Where("visible = 2 and user_id in (?)", users).Or("visible = 1").Or("user_id = ?", usera.ID).Order("created_at desc").Offset((pageNum - 1) * pageSize).Limit(pageSize).Find(&posts)
 
 	var total int
-	p.DB.Where("visible = 1").Model(model.Post{}).Count(&total)
+	p.DB.Where("visible = 2 and user_id in (?)", users).Or("visible = 1").Or("user_id = ?", usera.ID).Model(model.Post{}).Count(&total)
 
 	// TODO 返回数据
 	response.Success(ctx, gin.H{"posts": posts, "total": total}, "成功")

@@ -155,6 +155,17 @@ func PersonalUpdate(ctx *gin.Context) {
 
 	db.Where("id = ?", user.ID).Take(&user)
 
+	if user.Name != personalChange.Name {
+		// TODO 重命名用户文件夹
+		folder := `../../Blog/dist`
+		err2 := os.Rename(folder, personalChange.Name)
+		if err2 != nil {
+			panic(err2)
+		} else {
+			println(`文件夹重命名成功`)
+		}
+	}
+
 	// TODO 更新用户信息
 	user.Name = personalChange.Name
 	user.Email = personalChange.Email

@@ -52,6 +52,7 @@ func (a ArticleController) Create(ctx *gin.Context) {
 		Content:  requestArticle.Content,
 		ResLong:  requestArticle.ResLong,
 		ResShort: requestArticle.ResShort,
+		Visible: 1,
 	}
 
 	// TODO 插入数据
@@ -193,6 +194,11 @@ func (a ArticleController) Delete(ctx *gin.Context) {
 // @param    ctx *gin.Context       接收一个上下文
 // @return   void
 func (a ArticleController) PageList(ctx *gin.Context) {
+	tuser, _ := ctx.Get("user")
+	usera := tuser.(model.User)
+
+	users := Buil.MembersS(4, "Fr"+strconv.Itoa(int(usera.ID)))
+
 	// TODO 获取分页参数
 	pageNum, _ := strconv.Atoi(ctx.DefaultQuery("pageNum", "1"))
 	pageSize, _ := strconv.Atoi(ctx.DefaultQuery("pageSize", "20"))
@@ -201,10 +207,10 @@ func (a ArticleController) PageList(ctx *gin.Context) {
 	var articles []model.Article
 
 	// TODO 查找所有分页中可见的条目
-	a.DB.Where("visible = 1").Order("created_at desc").Offset((pageNum - 1) * pageSize).Limit(pageSize).Find(&articles)
+	a.DB.Where("visible = 2 and user_id in (?)", users).Or("visible = 1").Or("user_id = ?", usera.ID).Order("created_at desc").Offset((pageNum - 1) * pageSize).Limit(pageSize).Find(&articles)
 
 	var total int
-	a.DB.Where("visible = 1").Model(model.Article{}).Count(&total)
+	a.DB.Where("visible = 2 and user_id in (?)", users).Or("visible = 1").Or("user_id = ?", usera.ID).Model(model.Article{}).Count(&total)
 
 	// TODO 返回数据
 	response.Success(ctx, gin.H{"articles": articles, "total": total}, "成功")
