@@ -1,1 +1,126 @@
-<!DOCTYPE html><html lang=""><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="favicon.ico"><title>app</title><link href="static/css/chunk-090887de.f2a4f054.css" rel="prefetch"><link href="static/css/chunk-21e4124e.0bcfbfbc.css" rel="prefetch"><link href="static/css/chunk-25184077.d3e2c614.css" rel="prefetch"><link href="static/css/chunk-495ac86c.d57a6aec.css" rel="prefetch"><link href="static/css/chunk-62e4b303.82f1e506.css" rel="prefetch"><link href="static/css/chunk-6440f6d0.9662713d.css" rel="prefetch"><link href="static/css/chunk-72db4d2a.d186145c.css" rel="prefetch"><link href="static/css/chunk-73377230.09a0b323.css" rel="prefetch"><link href="static/css/chunk-85298c52.61814b16.css" rel="prefetch"><link href="static/js/chunk-090887de.bfca010d.js" rel="prefetch"><link href="static/js/chunk-21e4124e.21072141.js" rel="prefetch"><link href="static/js/chunk-25184077.47f74751.js" rel="prefetch"><link href="static/js/chunk-495ac86c.0d02c06d.js" rel="prefetch"><link href="static/js/chunk-62e4b303.5c1781d2.js" rel="prefetch"><link href="static/js/chunk-6440f6d0.7ef5af9b.js" rel="prefetch"><link href="static/js/chunk-72db4d2a.c0706db3.js" rel="prefetch"><link href="static/js/chunk-73377230.6481f9eb.js" rel="prefetch"><link href="static/js/chunk-85298c52.b1a5e77b.js" rel="prefetch"><link href="static/css/app.2f17549c.css" rel="preload" as="style"><link href="static/css/chunk-vendors.d41e23a3.css" rel="preload" as="style"><link href="static/js/app.7378c31d.js" rel="preload" as="script"><link href="static/js/chunk-vendors.ab01124e.js" rel="preload" as="script"><link href="static/css/chunk-vendors.d41e23a3.css" rel="stylesheet"><link href="static/css/app.2f17549c.css" rel="stylesheet"></head><body><noscript><strong>We're sorry but app doesn't work properly without JavaScript enabled. Please enable it to continue.</strong></noscript><div id="app"></div><script src="static/js/chunk-vendors.ab01124e.js"></script><script src="static/js/app.7378c31d.js"></script></body></html>
+<!DOCTYPE html><html lang=""><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="icon.ico"><title>chitchat</title><link href="static/css/chunk-vendors.d41e23a3.css" rel="stylesheet"><link href="static/css/app.2f17549c.css" rel="stylesheet"></head><body><noscript><strong>We're sorry but chitchat doesn't work properly without JavaScript enabled. Please enable it to continue.</strong></noscript><div id="app"></div><div id="appLoading"><div class="loading"></div></div><div id="app" style="display: none"></div><script src="static/js/chunk-vendors.005fb5a6.js"></script><script src="static/js/app.63a02225.js"></script></body></html><style media="screen" type="text/css">.loading {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background-color: #000;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: 0;
+    z-index: 9999;
+    ;
+    opacity: 0.8;
+  }
+
+  .loading.fixed {
+    position: fixed;
+  }
+
+  .loading:before {
+    content: '';
+    background-color: rgba(0, 0, 0, 0);
+    border: 5px solid rgba(0, 183, 229, 0.9);
+    opacity: .9;
+    border-right: 5px solid rgba(0, 0, 0, 0);
+    border-left: 5px solid rgba(0, 0, 0, 0);
+    border-radius: 50px;
+    box-shadow: 0 0 35px #2187e7;
+    width: 50px;
+    height: 50px;
+    -moz-animation: spinPulse 1s infinite ease-in-out;
+    -webkit-animation: spinPulse 1s infinite linear;
+    margin: -25px 0 0 -25px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+  }
+
+  .loading:after {
+    content: '';
+    background-color: rgba(0, 0, 0, 0);
+    border: 5px solid rgba(0, 183, 229, 0.9);
+    opacity: .9;
+    border-left: 5px solid rgba(0, 0, 0, 0);
+    border-right: 5px solid rgba(0, 0, 0, 0);
+    border-radius: 50px;
+    box-shadow: 0 0 15px #2187e7;
+    width: 30px;
+    height: 30px;
+    -moz-animation: spinoffPulse 1s infinite linear;
+    -webkit-animation: spinoffPulse 1s infinite linear;
+
+    margin: -15px 0 0 -15px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+  }
+
+  @-moz-keyframes spinPulse {
+
+    0% {
+
+      -moz-transform: rotate(160deg);
+      opacity: 0;
+      box-shadow: 0 0 1px #2187e7;
+    }
+
+    50% {
+
+      -moz-transform: rotate(145deg);
+      opacity: 1;
+    }
+
+    100% {
+
+      -moz-transform: rotate(-320deg);
+      opacity: 0;
+    }
+  }
+
+  @-moz-keyframes spinoffPulse {
+
+    0% {
+
+      -moz-transform: rotate(0deg);
+    }
+
+    100% {
+
+      -moz-transform: rotate(360deg);
+    }
+  }
+
+  @-webkit-keyframes spinPulse {
+
+    0% {
+
+      -webkit-transform: rotate(160deg);
+      opacity: 0;
+      box-shadow: 0 0 1px #2187e7;
+    }
+
+    50% {
+
+      -webkit-transform: rotate(145deg);
+      opacity: 1;
+    }
+
+    100% {
+
+      -webkit-transform: rotate(-320deg);
+      opacity: 0;
+    }
+  }
+
+  @-webkit-keyframes spinoffPulse {
+
+    0% {
+
+      -webkit-transform: rotate(0deg);
+    }
+
+    100% {
+
+      -webkit-transform: rotate(360deg);
+    }
+  }</style>
