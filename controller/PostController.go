@@ -14,7 +14,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 // IPostController			定义了帖子类接口
@@ -52,13 +52,17 @@ func (p PostController) Create(ctx *gin.Context) {
 		Content:  requestPost.Content,
 		ResLong:  requestPost.ResLong,
 		ResShort: requestPost.ResShort,
-		Visible: 1,
+		Visible:  1,
 	}
 
 	// TODO 插入数据
 	if err := p.DB.Create(&post).Error; err != nil {
 		panic(err)
 	}
+
+	// TODO 初始化热度
+	Buil.AddZ(3, "H", post.ID.String(), 100)
+	Buil.IncrByZ(4, "H", strconv.Itoa(int(user.(model.User).ID)), 100)
 
 	// TODO 成功
 	response.Success(ctx, gin.H{"post": post}, "创建成功")
@@ -86,7 +90,7 @@ func (p PostController) Update(ctx *gin.Context) {
 	postId := ctx.Params.ByName("id")
 
 	var post model.Post
-	if p.DB.Where("id = ?", postId).First(&post).RecordNotFound() {
+	if p.DB.Where("id = ?", postId).First(&post).Error != nil {
 		response.Fail(ctx, nil, "帖子不存在")
 		return
 	}
@@ -98,7 +102,7 @@ func (p PostController) Update(ctx *gin.Context) {
 	}
 
 	// TODO 更新帖子
-	if err := p.DB.Model(&post).Update(requestPost).Error; err != nil {
+	if err := p.DB.Model(&post).Updates(requestPost).Error; err != nil {
 		response.Fail(ctx, nil, "更新失败")
 		return
 	}
@@ -120,7 +124,7 @@ func (p PostController) Show(ctx *gin.Context) {
 
 	var post model.Post
 	// TODO 查看帖子是否存在
-	if p.DB.Where("id = ?", postId).First(&post).RecordNotFound() {
+	if p.DB.Where("id = ?", postId).First(&post).Error != nil {
 		response.Fail(ctx, nil, "帖子不存在")
 		return
 	}
@@ -131,15 +135,12 @@ func (p PostController) Show(ctx *gin.Context) {
 		return
 	}
 
-	var threads []model.Thread
-	p.DB.Order("created_at asc").Where("post_id = ?", post.ID).Find(&threads)
-
 	// TODO 返回数据
-	response.Success(ctx, gin.H{"post": post, "threads": threads}, "成功")
+	response.Success(ctx, gin.H{"post": post}, "成功")
 }
 
 // @title    Delete
-// @description   删除帖子或跟贴
+// @description   删除帖子
 // @auth      MGAronya（张健）       2022-9-16 12:15
 // @param    ctx *gin.Context       接收一个上下文
 // @return   void
@@ -153,7 +154,7 @@ func (p PostController) Delete(ctx *gin.Context) {
 	postId := ctx.Params.ByName("id")
 
 	var post model.Post
-	if p.DB.Where("id = ?", postId).First(&post).RecordNotFound() {
+	if p.DB.Where("id = ?", postId).First(&post).Error != nil {
 		response.Fail(ctx, nil, "帖子不存在")
 		return
 	}
@@ -187,17 +188,16 @@ func (p PostController) Delete(ctx *gin.Context) {
 	p.DB.Where("post_id = ?", postId).Find(&threads)
 
 	for _, thread := range threads {
-		// TODO 移除收藏
-		for _, val := range Buil.MembersS(3, "taF"+thread.ID.String()) {
-			Buil.RemS(3, "tFa"+val, thread.ID.String())
-		}
-		Buil.Del(3, "taF"+thread.ID.String())
-
-		// TODO 移除点赞
-		Buil.Del(3, "tiL"+thread.ID.String())
+		DeleteThreadHot(&thread)
 	}
 
 	Buil.DelH(3, "W", post.ID.String())
+
+	// TODO 更新热度
+	Buil.Del(3, "C"+postId)
+	Buil.Del(3, "M"+postId)
+	Buil.IncrByZ(4, "H", strconv.Itoa(int(userId)), -Buil.ScoreZ(3, "H", postId))
+	Buil.RemZ(3, "H", postId)
 
 	// TODO 删除帖子
 	p.DB.Where(model.Thread{PostId: post.ID.String()}).Delete(model.Thread{})
@@ -227,7 +227,7 @@ func (p PostController) PageList(ctx *gin.Context) {
 	// TODO 查找所有分页中可见的条目
 	p.DB.Where("visible = 2 and user_id in (?)", users).Or("visible = 1").Or("user_id = ?", usera.ID).Order("created_at desc").Offset((pageNum - 1) * pageSize).Limit(pageSize).Find(&posts)
 
-	var total int
+	var total int64
 	p.DB.Where("visible = 2 and user_id in (?)", users).Or("visible = 1").Or("user_id = ?", usera.ID).Model(model.Post{}).Count(&total)
 
 	// TODO 返回数据

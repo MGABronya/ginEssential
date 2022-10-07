@@ -14,7 +14,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 // IThreadController			定义了跟帖类接口
@@ -46,7 +46,7 @@ func (t ThreadController) Create(ctx *gin.Context) {
 	var post model.Post
 
 	// TODO 查看帖子是否存在
-	if t.DB.Where("id = ?", ctx.Params.ByName("id")).First(&post).RecordNotFound() {
+	if t.DB.Where("id = ?", ctx.Params.ByName("id")).First(&post).Error != nil {
 		response.Fail(ctx, nil, "帖子不存在")
 		return
 	}
@@ -66,6 +66,22 @@ func (t ThreadController) Create(ctx *gin.Context) {
 	// TODO 插入数据
 	if err := t.DB.Create(&thread).Error; err != nil {
 		panic(err)
+	}
+
+	// TODO 更新热度
+	if !Buil.IsS(2, "M"+thread.PostId, strconv.Itoa(int(user.(model.User).ID))) {
+		Buil.SetS(2, "M"+thread.PostId, strconv.Itoa(int(user.(model.User).ID)))
+	}
+
+	Buil.AddZ(3, "TH", thread.ID.String(), 20)
+	Buil.IncrByZ(4, "H", strconv.Itoa(int(user.(model.User).ID)), 20)
+	Buil.IncrByZ(3, "H", thread.PostId, 10)
+	Buil.IncrByZ(4, "H", strconv.Itoa(int(post.UserId)), 10)
+
+	// TODO 用户标签分数上升
+	labels := Buil.MembersS(3, "aL"+post.ID.String())
+	for _, label := range labels {
+		Buil.IncrByZ(4, "L"+strconv.Itoa(int(user.(model.User).ID)), label, 5)
 	}
 
 	// TODO 成功
@@ -94,7 +110,7 @@ func (t ThreadController) Update(ctx *gin.Context) {
 	threadId := ctx.Params.ByName("id")
 
 	var thread model.Thread
-	if t.DB.Where("id = ?", threadId).First(&thread).RecordNotFound() {
+	if t.DB.Where("id = ?", threadId).First(&thread).Error != nil {
 		response.Fail(ctx, nil, "跟帖不存在")
 		return
 	}
@@ -106,7 +122,7 @@ func (t ThreadController) Update(ctx *gin.Context) {
 	}
 
 	// TODO 更新帖子
-	if err := t.DB.Model(&thread).Update(requestThread).Error; err != nil {
+	if err := t.DB.Model(&thread).Updates(requestThread).Error; err != nil {
 		response.Fail(ctx, nil, "更新失败")
 		return
 	}
@@ -125,7 +141,7 @@ func (t ThreadController) Show(ctx *gin.Context) {
 
 	var thread model.Thread
 	// TODO 查看跟帖是否存在
-	if t.DB.Where("id = ?", threadId).First(&thread).RecordNotFound() {
+	if t.DB.Where("id = ?", threadId).First(&thread).Error != nil {
 		response.Fail(ctx, nil, "跟帖不存在")
 		return
 	}
@@ -149,7 +165,7 @@ func (t ThreadController) Delete(ctx *gin.Context) {
 	threadId := ctx.Params.ByName("id")
 
 	var thread model.Thread
-	if t.DB.Where("id = ?", threadId).First(&thread).RecordNotFound() {
+	if t.DB.Where("id = ?", threadId).First(&thread).Error != nil {
 		response.Fail(ctx, nil, "跟帖不存在")
 		return
 	}
@@ -159,17 +175,26 @@ func (t ThreadController) Delete(ctx *gin.Context) {
 		return
 	}
 
-	// TODO 删除帖子
+	var post model.Post
+	if t.DB.Where("id = ?", thread.PostId).First(&post).Error != nil {
+		response.Fail(ctx, nil, "帖子不存在")
+		return
+	}
+
+	// TODO 删除跟帖
 	t.DB.Delete(&thread)
 
-	// TODO 移除收藏
-	for _, val := range Buil.MembersS(3, "taF"+threadId) {
-		Buil.RemS(3, "tFa"+val, threadId)
-	}
-	Buil.Del(3, "taF"+threadId)
+	// TODO 移除跟帖热度
+	DeleteThreadHot(&thread)
+	Buil.IncrByZ(4, "H", strconv.Itoa(int(post.UserId)), -Buil.ScoreZ(3, "TH", threadId)*0.5)
 
-	// TODO 移除点赞
-	Buil.Del(3, "tiL"+threadId)
+	// TODO 用户标签分数下降
+	labels := Buil.MembersS(3, "aL"+post.ID.String())
+	for _, label := range labels {
+		Buil.IncrByZ(4, "L"+strconv.Itoa(int(user.(model.User).ID)), label, -5)
+	}
+
+	Buil.RemZ(3, "TH", threadId)
 
 	response.Success(ctx, gin.H{"thread": thread}, "删除成功")
 }
@@ -190,7 +215,7 @@ func (t ThreadController) PageList(ctx *gin.Context) {
 	var post model.Post
 
 	// TODO 查看帖子是否存在
-	if t.DB.Where("id = ?", postId).First(&post).RecordNotFound() {
+	if t.DB.Where("id = ?", postId).First(&post).Error != nil {
 		response.Fail(ctx, nil, "帖子不存在")
 		return
 	}
@@ -210,7 +235,7 @@ func (t ThreadController) PageList(ctx *gin.Context) {
 	t.DB.Where("post_id = ?", postId).Order("created_at desc").Offset((pageNum - 1) * pageSize).Limit(pageSize).Find(&threads)
 
 	// TODO 记录的总条数
-	var total int
+	var total int64
 	t.DB.Model(model.Thread{}).Count(&total)
 
 	// TODO 返回数据
@@ -226,4 +251,27 @@ func NewThreadController() IThreadController {
 	db := common.GetDB()
 	db.AutoMigrate(model.Thread{})
 	return ThreadController{DB: db}
+}
+
+// @title    DeleteThreadHot
+// @description   移除一个指定thread的热度
+// @auth      MGAronya（张健）       2022-9-16 12:15
+// @param    ctx *gin.Context       接收一个thread
+// @return   void
+func DeleteThreadHot(threadpoint *model.Thread) {
+	thread := *threadpoint
+	// TODO 移除收藏
+	for _, val := range Buil.MembersS(3, "taF"+thread.ID.String()) {
+		Buil.RemS(3, "tFa"+val, thread.ID.String())
+	}
+	Buil.Del(3, "taF"+thread.ID.String())
+
+	// TODO 移除点赞
+	Buil.Del(3, "tiL"+thread.ID.String())
+
+	// TODO 更新热度
+	Buil.IncrByZ(3, "H", thread.PostId, -Buil.ScoreZ(3, "TH", thread.ID.String())*0.5)
+	Buil.IncrByZ(4, "H", strconv.Itoa(int(thread.UserId)), -Buil.ScoreZ(3, "TH", thread.ID.String()))
+
+	Buil.RemZ(3, "TH", thread.ID.String())
 }

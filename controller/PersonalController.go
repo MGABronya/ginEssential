@@ -55,7 +55,7 @@ func PersonalPageArticles(ctx *gin.Context) {
 	db.Where("user_id = ?", user.ID).Order("created_at desc").Offset((pageNum - 1) * pageSize).Limit(pageSize).Find(&articles)
 
 	// TODO 记录的总条数
-	var total int
+	var total int64
 	db.Where("user_id = ?", user.ID).Model(model.Article{}).Count(&total)
 
 	// TODO 返回数据
@@ -82,7 +82,7 @@ func PersonalPagePosts(ctx *gin.Context) {
 	db.Where("user_id = ?", user.ID).Order("created_at desc").Offset((pageNum - 1) * pageSize).Limit(pageSize).Find(&posts)
 
 	// TODO 记录的总条数
-	var total int
+	var total int64
 	db.Where("user_id = ?", user.ID).Model(model.Post{}).Count(&total)
 
 	// TODO 返回数据
@@ -109,7 +109,7 @@ func PersonalPageThreads(ctx *gin.Context) {
 	db.Where("user_id = ?", user.ID).Order("created_at desc").Offset((pageNum - 1) * pageSize).Limit(pageSize).Find(&threads)
 
 	// TODO 记录的总条数
-	var total int
+	var total int64
 	db.Where("user_id = ?", user.ID).Model(model.Thread{}).Count(&total)
 
 	// TODO 返回数据
@@ -134,6 +134,10 @@ func PersonalUpdate(ctx *gin.Context) {
 	}
 	if !util.VerifyEmailFormat(personalChange.Email) {
 		response.Response(ctx, 201, 201, nil, "邮箱格式错误")
+		return
+	}
+	if personalChange.Email != user.Email && !util.IsEmailPass(personalChange.Email, personalChange.Verify) {
+		response.Response(ctx, 201, 201, nil, "邮箱验证码错误")
 		return
 	}
 	if personalChange.Email != user.Email && util.IsEmailExist(db, personalChange.Email) {
@@ -250,7 +254,7 @@ func PersonalShow(ctx *gin.Context) {
 	var user model.User
 
 	// TODO 查看用户是否存在
-	if db.Where("id = ?", ctx.Params.ByName("id")).First(&user).RecordNotFound() {
+	if db.Where("id = ?", ctx.Params.ByName("id")).First(&user).Error != nil {
 		response.Fail(ctx, nil, "用户不存在")
 		return
 	}
@@ -275,7 +279,7 @@ func PersonalShowArticles(ctx *gin.Context) {
 	userId := ctx.Params.ByName("id")
 
 	// TODO 查看用户是否存在
-	if db.Where("id = ?", ctx.Params.ByName("id")).First(&model.User{}).RecordNotFound() {
+	if db.Where("id = ?", ctx.Params.ByName("id")).First(&model.User{}).Error != nil {
 		response.Fail(ctx, nil, "用户不存在")
 		return
 	}
@@ -295,7 +299,7 @@ func PersonalShowArticles(ctx *gin.Context) {
 	db.Where("user_id = ? and visible < ?", user.ID, level).Order("created_at desc").Offset((pageNum - 1) * pageSize).Limit(pageSize).Find(&articles)
 
 	// TODO 记录的总条数
-	var total int
+	var total int64
 	db.Where("user_id = ? and visible < ?", user.ID, level).Model(model.Article{}).Count(&total)
 
 	// TODO 返回数据
@@ -319,7 +323,7 @@ func PersonalShowPosts(ctx *gin.Context) {
 	userId := ctx.Params.ByName("id")
 
 	// TODO 查看用户是否存在
-	if db.Where("id = ?", ctx.Params.ByName("id")).First(&model.User{}).RecordNotFound() {
+	if db.Where("id = ?", ctx.Params.ByName("id")).First(&model.User{}).Error != nil {
 		response.Fail(ctx, nil, "用户不存在")
 		return
 	}
@@ -339,7 +343,7 @@ func PersonalShowPosts(ctx *gin.Context) {
 	db.Where("user_id = ? and visible < ?", user.ID, level).Order("created_at desc").Offset((pageNum - 1) * pageSize).Limit(pageSize).Find(&posts)
 
 	// TODO 记录的总条数
-	var total int
+	var total int64
 	db.Where("user_id = ? and visible < ?", user.ID, level).Model(model.Post{}).Count(&total)
 
 	// TODO 返回数据
@@ -363,7 +367,7 @@ func PersonalShowThreads(ctx *gin.Context) {
 	userId := ctx.Params.ByName("id")
 
 	// TODO 查看用户是否存在
-	if db.Where("id = ?", ctx.Params.ByName("id")).First(&model.User{}).RecordNotFound() {
+	if db.Where("id = ?", ctx.Params.ByName("id")).First(&model.User{}).Error != nil {
 		response.Fail(ctx, nil, "用户不存在")
 		return
 	}
@@ -383,7 +387,7 @@ func PersonalShowThreads(ctx *gin.Context) {
 	db.Table("threads").Joins("join posts on threads.post_id = posts.id").Where("posts.user_id = ? and posts.visible < ?", user.ID, level).Order("created_at desc").Offset((pageNum - 1) * pageSize).Limit(pageSize).Find(&threads)
 
 	// TODO 记录的总条数
-	var total int
+	var total int64
 	db.Table("threads").Joins("join posts on threads.post_id = posts.id").Where("posts.user_id = ? and posts.visible < ?", user.ID, level).Model(model.Thread{}).Count(&total)
 
 	// TODO 返回数据

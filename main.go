@@ -20,8 +20,7 @@ import (
 // @return    void			没有回参
 func main() {
 	InitConfig()
-	db := common.InitDB()
-	defer db.Close()
+	common.InitDB()
 	client0 := common.InitRedis(0)
 	defer client0.Close()
 	client1 := common.InitRedis(1)

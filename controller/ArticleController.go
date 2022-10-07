@@ -14,7 +14,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 // IArticleController			定义了文章类接口
@@ -52,13 +52,17 @@ func (a ArticleController) Create(ctx *gin.Context) {
 		Content:  requestArticle.Content,
 		ResLong:  requestArticle.ResLong,
 		ResShort: requestArticle.ResShort,
-		Visible: 1,
+		Visible:  1,
 	}
 
 	// TODO 插入数据
 	if err := a.DB.Create(&article).Error; err != nil {
 		panic(err)
 	}
+
+	// TODO 初始化热度
+	Buil.AddZ(1, "H", article.ID.String(), 100)
+	Buil.IncrByZ(4, "H", strconv.Itoa(int(user.(model.User).ID)), 100)
 
 	// TODO 成功
 	response.Success(ctx, gin.H{"article": article}, "创建成功")
@@ -84,7 +88,7 @@ func (a ArticleController) Update(ctx *gin.Context) {
 	var article model.Article
 
 	// TODO 查看文章是否存在
-	if a.DB.Where("id = ?", articleId).First(&article).RecordNotFound() {
+	if a.DB.Where("id = ?", articleId).First(&article).Error != nil {
 		response.Fail(ctx, nil, "文章不存在")
 		return
 	}
@@ -101,7 +105,7 @@ func (a ArticleController) Update(ctx *gin.Context) {
 	}
 
 	// TODO 更新文章
-	if err := a.DB.Model(&article).Update(requestArticle).Error; err != nil {
+	if err := a.DB.Model(&article).Updates(requestArticle).Error; err != nil {
 		response.Fail(ctx, nil, "更新失败")
 		return
 	}
@@ -123,7 +127,7 @@ func (a ArticleController) Show(ctx *gin.Context) {
 	user := tuser.(model.User)
 
 	// TODO 查看文章是否在数据库中存在
-	if a.DB.Where("id = ?", articleId).First(&article).RecordNotFound() {
+	if a.DB.Where("id = ?", articleId).First(&article).Error != nil {
 		response.Fail(ctx, nil, "文章不存在")
 		return
 	}
@@ -149,7 +153,7 @@ func (a ArticleController) Delete(ctx *gin.Context) {
 	var article model.Article
 
 	// TODO 查看文章是否存在
-	if a.DB.Where("id = ?", articleId).First(&article).RecordNotFound() {
+	if a.DB.Where("id = ?", articleId).First(&article).Error != nil {
 		response.Fail(ctx, nil, "文章不存在")
 		return
 	}
@@ -185,6 +189,11 @@ func (a ArticleController) Delete(ctx *gin.Context) {
 	}
 	Buil.Del(1, "aL"+articleId)
 
+	// TODO 更新热度
+	Buil.Del(1, "C"+articleId)
+	Buil.IncrByZ(4, "H", strconv.Itoa(int(userId)), -Buil.ScoreZ(1, "H", articleId))
+	Buil.RemZ(1, "H", articleId)
+
 	response.Success(ctx, gin.H{"article": article}, "删除成功")
 }
 
@@ -209,7 +218,7 @@ func (a ArticleController) PageList(ctx *gin.Context) {
 	// TODO 查找所有分页中可见的条目
 	a.DB.Where("visible = 2 and user_id in (?)", users).Or("visible = 1").Or("user_id = ?", usera.ID).Order("created_at desc").Offset((pageNum - 1) * pageSize).Limit(pageSize).Find(&articles)
 
-	var total int
+	var total int64
 	a.DB.Where("visible = 2 and user_id in (?)", users).Or("visible = 1").Or("user_id = ?", usera.ID).Model(model.Article{}).Count(&total)
 
 	// TODO 返回数据
