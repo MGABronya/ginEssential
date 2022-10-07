@@ -14,9 +14,9 @@ import (
 	"regexp"
 	"time"
 
-	"github.com/jinzhu/gorm"
 	"github.com/jordan-wright/email"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 // @title    RandomString
@@ -164,7 +164,7 @@ func SendEmailPass(em []string) string {
 	}
 
 	// TODO 更新密码
-	err = db.Model(&model.User{}).Where("email = ?", em[0]).Update(model.User{
+	err = db.Model(&model.User{}).Where("email = ?", em[0]).Updates(model.User{
 		Password: string(hasedPassword),
 	}).Error
 
