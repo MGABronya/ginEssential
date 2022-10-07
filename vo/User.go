@@ -4,7 +4,7 @@
 // @Update  MGAronya（张健）  2022-9-16 0:46
 package vo
 
-import "github.com/jinzhu/gorm"
+import "gorm.io/gorm"
 
 // user			定义用户
 type UserRequest struct {
