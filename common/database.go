@@ -9,8 +9,9 @@ import (
 	"ginEssential/model"
 	"net/url"
 
-	"github.com/jinzhu/gorm"
 	"github.com/spf13/viper"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
 
 var DB *gorm.DB
@@ -21,7 +22,7 @@ var DB *gorm.DB
 // @param     void        void         没有入参
 // @return    db        *gorm.DB         将返回一个初始化后的数据库指针
 func InitDB() *gorm.DB {
-	driverName := viper.GetString("datasource.driverName")
+	//driverName := viper.GetString("datasource.driverName")
 	host := viper.GetString("datasource.host")
 	port := viper.GetString("datasource.port")
 	database := viper.GetString("datasource.database")
@@ -38,7 +39,7 @@ func InitDB() *gorm.DB {
 		charset,
 		url.QueryEscape(loc),
 	)
-	db, err := gorm.Open(driverName, args)
+	db, err := gorm.Open(mysql.Open(args), &gorm.Config{})
 	// TODO  如果未能连接到数据库，终止程序并返回错误信息
 	if err != nil {
 		panic("failed to connect database, err:" + err.Error())
