@@ -62,7 +62,7 @@
 
     返回值：返回用户的一些个人信息，格式为json包含Name,Email,Telephone,Blog,QQ,Sex,Address,Hobby,Icon,BackGround，除Sex为bool类型外，其它均为字符串类型，其中Icon和BackGround表示头像和背景图片的文件名。
 
-  - **接口地址：/personalarticles**
+  - **接口地址：/personal/articles**
 
     **功能：获取当前用户的文章列表**
 
@@ -72,7 +72,7 @@
 
     返回值：返回中包含一个articles数组，其中包含了该用户所有文章的信息。在Params处提供pageNum（表示第几页，默认值为1）和pageSize（表示一页多少篇文章，默认值为20）。
 
-  - **接口地址：/personalposts**
+  - **接口地址：/personal/posts**
 
     **功能：获取当前用户的帖子列表**
 
@@ -82,7 +82,7 @@
 
     返回值：返回中包含一个posts数组，其中包含了该用户所有帖子的信息。
 
-  - **接口地址：/personalthreads**
+  - **接口地址：/personal/threads**
 
     **功能：获取当前用户的跟帖列表**
 
@@ -92,7 +92,7 @@
 
     返回值：返回中包含一个threads数组，其中包含了该用户所有跟帖的信息。
 
-  - **接口地址：/personalusers**
+  - **接口地址：/personal/users**
 
     **功能：提供一组userid，返回一组对应的用户信息**
 
@@ -108,11 +108,11 @@
 
     **方法类型：PUT**
 
-    请求参数：Authorization中的Bearer Token中提供注册、登录时给出的token。在Body	中，raw格式提供json包含Newname,Newtelephone,Newemail,Newhobby,Newaddress,Newsex,Newqq,Newblog表示修改后的信息。
+    请求参数：Authorization中的Bearer Token中提供注册、登录时给出的token。在Body	中，raw格式提供json包含Newname,Newtelephone,Newemail,Newhobby,Newaddress,Newsex,Newqq,Newblog，Verify表示修改后的信息，当email被修改时，需要提供Verify，其它情况不需要提供。
 
     返回值：更新成功后返回用户更新后的个人信息，否则返回错误原因。
 
-  - **接口地址：/personalicon**
+  - **接口地址：/personal/icon**
 
     **功能：修改个人头像**
 
@@ -162,7 +162,7 @@
 
     返回值：成功时返回被查看用户的信息，失败时给出失败原因。
     
-  - **接口地址：/personalarticles/:id**
+  - **接口地址：/personal/articles/:id**
 
     **功能：展示指定用户的文章列表**
 
@@ -172,7 +172,7 @@
 
     返回值：返回一个articles表示指定用户的文章列表
 
-  - **接口地址：/personalposts/:id**
+  - **接口地址：/personal/posts/:id**
 
     **功能：展示指定用户的帖子列表**
 
@@ -182,7 +182,7 @@
 
     返回值：返回一个posts表示指定用户的帖子列表
 
-  - **接口地址：/personalthreads/:id**
+  - **接口地址：/personal/threads/:id**
 
     **功能：展示指定用户的跟帖列表**
 
@@ -212,7 +212,7 @@
 
     请求参数：文章的uuid（在接口地址的id处），Authorization中的Bearer Token中提供注册、登录时给出的token。
 
-    返回值：成功找到文章时，将会以json格式给出文章article和作者user，article中包含id,user_id,content,create_at,updated_at,res_short,res_long。user中包含Name,Email,Telephone,Blog,QQ,Sex,Address,Hobby,Icon。如果失败则返回失败原因。
+    返回值：成功找到文章时，将会以json格式给出文章article，article中包含id,user_id,content,create_at,updated_at,res_short,res_long。如果失败则返回失败原因。
 
   - **接口地址：/article/:id**
 
@@ -274,7 +274,7 @@
 
     请求参数：thorization中的Bearer Token中提供注册、登录时给出的token。在接口地址的id中给出帖子的id。
 
-    返回值：成功时返回帖子post，帖子的跟帖threads。post中包含了id,user_id,title,content,res_long,res_short,create_at,updated_at。threads是个数组，包含了多个thread，每个thread包含了id,user_id,post_id,title,content,res_long,res_short,create_at,updated_at。
+    返回值：成功时返回帖子post。post中包含了id,user_id,title,content,res_long,res_short,create_at,updated_at。
 
   - **接口地址：/post/:id**
 

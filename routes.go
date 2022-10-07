@@ -39,34 +39,34 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 	r.GET("/personal", middleware.AuthMiddleware(), controller.PersonalPage)
 
 	// TODO 用户的个人文章路由
-	r.GET("/personalarticles", middleware.AuthMiddleware(), controller.PersonalPageArticles)
+	r.GET("/personal/articles", middleware.AuthMiddleware(), controller.PersonalPageArticles)
 
 	// TODO 用户的个人帖子路由
-	r.GET("/personalposts", middleware.AuthMiddleware(), controller.PersonalPagePosts)
+	r.GET("/personal/posts", middleware.AuthMiddleware(), controller.PersonalPagePosts)
 
 	// TODO 用户的个人跟帖路由
-	r.GET("/personalthreads", middleware.AuthMiddleware(), controller.PersonalPageThreads)
+	r.GET("/personal/threads", middleware.AuthMiddleware(), controller.PersonalPageThreads)
 
 	// TODO 用户的个人页面信息更新路由
 	r.PUT("/personal", middleware.AuthMiddleware(), controller.PersonalUpdate)
 
 	// TODO 用户的头像更新路由
-	r.PUT("/personalIcon", middleware.AuthMiddleware(), controller.PersonalIcon)
+	r.PUT("/personal/icon", middleware.AuthMiddleware(), controller.PersonalIcon)
 
 	// TODO 个人信息展示路由
 	r.GET("/personal/:id", middleware.AuthMiddleware(), controller.PersonalShow)
 
 	// TODO 个人文章展示路由
-	r.GET("/personalarticles/:id", middleware.AuthMiddleware(), controller.PersonalShowArticles)
+	r.GET("/personal/articles/:id", middleware.AuthMiddleware(), controller.PersonalShowArticles)
 
 	// TODO 个人帖子展示路由
-	r.GET("/personalposts/:id", middleware.AuthMiddleware(), controller.PersonalShowPosts)
+	r.GET("/personal/posts/:id", middleware.AuthMiddleware(), controller.PersonalShowPosts)
 
 	// TODO 个人跟帖展示路由
-	r.GET("/personalthreads/:id", middleware.AuthMiddleware(), controller.PersonalShowThreads)
+	r.GET("/personal/threads/:id", middleware.AuthMiddleware(), controller.PersonalShowThreads)
 
 	// TODO 查找一组用户的信息
-	r.POST("/personalusers", middleware.AuthMiddleware(), controller.PersonalShowUsers)
+	r.POST("/personal/users", middleware.AuthMiddleware(), controller.PersonalShowUsers)
 
 	// TODO 文章路由分组
 	articleRoutes := r.Group("/article")
