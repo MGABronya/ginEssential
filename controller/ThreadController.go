@@ -242,16 +242,6 @@ func (t ThreadController) PageList(ctx *gin.Context) {
 	response.Success(ctx, gin.H{"threads": threads, "total": total}, "成功")
 }
 
-// @title    NewThreadController
-// @description   新建一个跟帖的控制器
-// @auth      MGAronya（张健）       2022-9-16 12:15
-// @param    ctx *gin.Context       接收一个上下文
-// @return   void
-func NewThreadController() IThreadController {
-	db := common.GetDB()
-	db.AutoMigrate(model.Thread{})
-	return ThreadController{DB: db}
-}
 
 // @title    DeleteThreadHot
 // @description   移除一个指定thread的热度
@@ -274,4 +264,16 @@ func DeleteThreadHot(threadpoint *model.Thread) {
 	Buil.IncrByZ(4, "H", strconv.Itoa(int(thread.UserId)), -Buil.ScoreZ(3, "TH", thread.ID.String()))
 
 	Buil.RemZ(3, "TH", thread.ID.String())
+}
+
+
+// @title    NewThreadController
+// @description   新建一个跟帖的控制器
+// @auth      MGAronya（张健）       2022-9-16 12:15
+// @param    ctx *gin.Context       接收一个上下文
+// @return   void
+func NewThreadController() IThreadController {
+	db := common.GetDB()
+	db.AutoMigrate(model.Thread{})
+	return ThreadController{DB: db}
 }
