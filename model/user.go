@@ -9,7 +9,7 @@ import "gorm.io/gorm"
 // user			定义用户
 type User struct {
 	gorm.Model        // gorm的模板
-	Name       string `gorm:"type:varchar(20);not null"`        // 用户名称
+	Name       string `gorm:"type:varchar(20);not null;unique"` // 用户名称
 	Email      string `gorm:"type:varchar(50);not null;unique"` // 邮箱
 	Password   string `gorm:"size:255;not null"`                // 密码
 	Icon       string `gorm:"type:varchar(50)"`                 // 这里的Icon存储的是图像文件的url后缀
