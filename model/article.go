@@ -1,5 +1,5 @@
 // @Title  article
-// @Description  该中间件用于“拦截”运行时恐慌的内建函数,防止程序崩溃
+// @Description  定义文章
 // @Author  MGAronya（张健）
 // @Update  MGAronya（张健）  2022-9-16 0:46
 package model

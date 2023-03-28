@@ -161,7 +161,7 @@ func PersonalUpdate(ctx *gin.Context) {
 
 	if user.Name != personalChange.Name {
 		// TODO 重命名用户文件夹
-		folder := `../../Blog/dist`
+		folder := `../Blog/dist/` + user.Name
 		err2 := os.Rename(folder, personalChange.Name)
 		if err2 != nil {
 			panic(err2)

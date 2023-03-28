@@ -74,7 +74,7 @@ func (p PostController) Create(ctx *gin.Context) {
 // @param    ctx *gin.Context       接收一个上下文
 // @return   void
 func (p PostController) Update(ctx *gin.Context) {
-	var requestPost vo.CreatePostRequest
+	var requestPost model.Post
 	// TODO 数据验证
 	if err := ctx.ShouldBind(&requestPost); err != nil {
 		log.Print(err.Error())
