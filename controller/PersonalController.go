@@ -296,11 +296,11 @@ func PersonalShowArticles(ctx *gin.Context) {
 	}
 
 	// TODO 查找所有分页中可见的条目
-	db.Where("user_id = ? and visible < ?", user.ID, level).Order("created_at desc").Offset((pageNum - 1) * pageSize).Limit(pageSize).Find(&articles)
+	db.Where("user_id = ? and visible < ?", userId, level).Order("created_at desc").Offset((pageNum - 1) * pageSize).Limit(pageSize).Find(&articles)
 
 	// TODO 记录的总条数
 	var total int64
-	db.Where("user_id = ? and visible < ?", user.ID, level).Model(model.Article{}).Count(&total)
+	db.Where("user_id = ? and visible < ?", userId, level).Model(model.Article{}).Count(&total)
 
 	// TODO 返回数据
 	response.Success(ctx, gin.H{"articles": articles, "total": total}, "成功")
@@ -340,11 +340,11 @@ func PersonalShowPosts(ctx *gin.Context) {
 	}
 
 	// TODO 查找所有分页中可见的条目
-	db.Where("user_id = ? and visible < ?", user.ID, level).Order("created_at desc").Offset((pageNum - 1) * pageSize).Limit(pageSize).Find(&posts)
+	db.Where("user_id = ? and visible < ?", userId, level).Order("created_at desc").Offset((pageNum - 1) * pageSize).Limit(pageSize).Find(&posts)
 
 	// TODO 记录的总条数
 	var total int64
-	db.Where("user_id = ? and visible < ?", user.ID, level).Model(model.Post{}).Count(&total)
+	db.Where("user_id = ? and visible < ?", userId, level).Model(model.Post{}).Count(&total)
 
 	// TODO 返回数据
 	response.Success(ctx, gin.H{"posts": posts, "total": total}, "成功")
@@ -384,11 +384,11 @@ func PersonalShowThreads(ctx *gin.Context) {
 	}
 
 	// TODO 查找所有分页中可见的条目
-	db.Table("threads").Joins("join posts on threads.post_id = posts.id").Where("posts.user_id = ? and posts.visible < ?", user.ID, level).Order("created_at desc").Offset((pageNum - 1) * pageSize).Limit(pageSize).Find(&threads)
+	db.Table("threads").Joins("join posts on threads.post_id = posts.id").Where("posts.user_id = ? and posts.visible < ?", userId, level).Order("created_at desc").Offset((pageNum - 1) * pageSize).Limit(pageSize).Find(&threads)
 
 	// TODO 记录的总条数
 	var total int64
-	db.Table("threads").Joins("join posts on threads.post_id = posts.id").Where("posts.user_id = ? and posts.visible < ?", user.ID, level).Model(model.Thread{}).Count(&total)
+	db.Table("threads").Joins("join posts on threads.post_id = posts.id").Where("posts.user_id = ? and posts.visible < ?", userId, level).Model(model.Thread{}).Count(&total)
 
 	// TODO 返回数据
 	response.Success(ctx, gin.H{"threads": threads, "total": total}, "成功")
