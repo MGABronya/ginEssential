@@ -236,7 +236,7 @@ func (t ThreadController) PageList(ctx *gin.Context) {
 
 	// TODO 记录的总条数
 	var total int64
-	t.DB.Model(model.Thread{}).Count(&total)
+	t.DB.Where("post_id = ?", postId).Model(model.Thread{}).Count(&total)
 
 	// TODO 返回数据
 	response.Success(ctx, gin.H{"threads": threads, "total": total}, "成功")
